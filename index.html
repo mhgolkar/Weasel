@@ -172,6 +172,7 @@
 					WS.onclose = function(ev) { onClose(ev) };
 					WS.onmessage = function(ev) { onMessage(ev) };
 					WS.onerror = function(ev) { onError(ev) };
+					writeToScreen(`CONNECTING [${ url.value.toUpperCase() }]`, 'url');
 				} catch(err){
 					writeToScreen('Unable to Create Socket! ' + err.message, 'error');
 				}
@@ -186,7 +187,6 @@
 		}
 	}
 	function onOpen(ev){
-		writeToScreen( url.value, 'url');
 		writeToScreen('CONNECTION READY', 'opening');
 	}
 	function onClose(ev){
