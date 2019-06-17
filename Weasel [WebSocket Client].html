@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html  data-theme="normal">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<title>Weasel [The WebSocket Client]</title>
+	<style>
+	:root { /* light theme */
+		--color-0: rgb(254, 254, 254);
+		--color-1: rgb(255, 252, 222);
+		--color-2: rgb(26, 0, 52);
+		--color-3: rgb(43, 0, 0);
+		--color-4: rgb(16, 0, 40);
+	}
+	:root[data-theme^='dark'] { /* dark theme */
+		--color-0: rgb(0, 0, 0);
+		--color-1: rgb(26, 0, 52);
+		--color-2: rgb(255, 252, 222);
+		--color-3: rgb(19, 204, 129);
+		--color-4: rgb(0, 0, 0);
+	}
+	:root { /* terminal text color allways on kind of dark background */
+		--color-trm: rgb(255, 252, 222);
+		--color-opn: rgb(0, 255, 152);
+		--color-cls: rgb(255, 214, 0);
+		--color-err: rgb(255, 46, 46);
+		--color-out: #fe8e39;
+		--color-in: #24f3e2;
+	}
+	:root {
+		background-color: var(--color-1);
+		color: var(--color-2);
+		font-family: monospace, sans-serif;
+		font-size: 16px;
+		font-weight: 400;
+		width: 100vw;
+	}
+	body {
+		width: 90%;
+		margin-left: 2.5%;
+		overflow-x: hidden;
+		box-sizing: content-box;
+		border: none; outline: none;
+		padding: 0.25rem 1rem;
+	}
+	body > :first-child {
+		margin-top: 1.5rem !important;
+	}
+	h1, h2 {
+		margin: 0.5rem 0 0.25rem 0;
+	}
+	h1, h2 {
+	}
+	form, fieldset, div {
+		width: 100%;
+		box-sizing: border-box;
+		border-color: var(--color-2);
+		border-width: 1px;
+		margin: 0.5rem 0;
+	}
+	input {
+		margin: 0.25rem 0;
+	}
+	input[type='text'], input[type='text']::placeholder {
+		font-family: monospace, sans-serif;
+		padding: 0.5rem;
+		height: 1.5rem;
+		font-size: 1rem;
+	}
+	input[type='text'] {
+		background-color: var(--color-0);
+		color: var(--color-2);
+	}
+	input[type='button'], input[type='file'], input[type='submit'] {
+		font-size: 1rem;
+		font-weight: 700;
+		height: 2.25rem;
+	}
+	textarea {
+		width: 100%;
+		font-size: 1rem;
+		margin: 0.25rem 0;
+		padding: 1rem;
+		box-sizing: border-box;
+		border-color: var(--color-2);
+		background-color: var(--color-0);
+		color: var(--color-3);
+		border-width: 1px;
+		resize: vertical;
+	}
+	#terminal {
+		overflow-x: hidden;
+		overflow-y: auto;
+		height: 30vh;
+		resize: vertical;
+		background-color: var(--color-4);
+		padding: 1rem;
+		font-size: 1rem;
+	}
+	#terminal p {
+		margin: 0;
+		margin-top: 1px;
+		line-height: 1.5rem;
+		color: var(--color-trm);
+	}
+	#terminal p:last-of-type {
+		margin-bottom: 4rem;
+	}
+	#terminal p::before {
+		margin: auto 2rem;
+		font-size: 1.25rem;
+	}
+	#terminal p.outgoing::before { content: '▲'; }
+	#terminal p.incoming::before { content: '▼'; }
+	#terminal p.closing::before { content: '✘'; }
+	#terminal p.opening::before { content: '✔'; }
+	#terminal p.url::before { content: '✈';	}
+	#terminal p.error::before { content: '↯'; }
+	#terminal p.opening {
+		color: var(--color-opn);
+	}
+	#terminal p.closing {
+		color: var(--color-cls);
+	}
+	#terminal p.closing::after {
+		content: '';
+		width: 100%;
+		margin: 1.5rem 0; /* a gap between each dialogue */
+		display: block;
+		position: relative;
+		bottom: 0;
+		left: 0;
+		filter: opacity(0.25);
+		border-bottom: dotted 3px var(--color-cls);
+	}
+	#terminal p.error {
+		color: var(--color-err);
+	}
+	#terminal p.incoming {
+		color: var(--color-in);
+	}
+	#terminal p.outgoing {
+		color: var(--color-out);
+	}
+	#branding {
+		text-align: center;
+		width: 100%;
+		margin: 2rem 0;
+	}
+	a {
+		color: var(--color-2);
+		text-decoration: none;
+		border-bottom: 2px solid var(--color-2);
+		cursor: pointer;
+	}
+	</style>
+	<script language="javascript" type="text/javascript">
+	var WS, root, terminal, url, protocol, message;
+	var _ArrayBuffers = [], _Blobs = [];
+	function createSocket() {
+		let supports = 'WebSocket' in window || 'MozWebSocket' in window;
+		if ( supports ){
+			if ( url.value.length > 0 ) {
+				try {
+					if( protocol.value.length > 0 ) {
+						WS = window['MozWebSocket'] ? new MozWebSocket(url.value, protocol.value) : new WebSocket(url.value, protocol.value);
+					} else {
+						WS = window['MozWebSocket'] ? new MozWebSocket(url.value) : new WebSocket(url.value);
+					}
+					WS.onopen = function(ev) { onOpen(ev) };
+					WS.onclose = function(ev) { onClose(ev) };
+					WS.onmessage = function(ev) { onMessage(ev) };
+					WS.onerror = function(ev) { onError(ev) };
+				} catch(err){
+					writeToScreen('Unable to Create Socket! ' + err.message, 'error');
+				}
+			} else {
+				writeToScreen('We Need a URL to Connect!', 'error');
+			}
+			// also save the last configs to the storage
+			localStorage._weasel_last_used_protocol = protocol.value;
+			localStorage._weasel_last_used_url = url.value;
+		} else {
+			writeToScreen("This Browser Doesn't Support WebSocket!", 'error');
+		}
+	}
+	function onOpen(ev){
+		writeToScreen( url.value, 'url');
+		writeToScreen('CONNECTION READY', 'opening');
+	}
+	function onClose(ev){
+		writeToScreen("CONNECTION CLOSED!", 'closing');
+	}
+	function onMessage(ev){
+		let msg;
+		if ( ev.data instanceof ArrayBuffer ){
+			_ArrayBuffers.push(ev.data);
+			msg = `${ev.data.byteLength} byte ArrayBuffer!\r\n May Use Your Browser's Console to Catch it: _ArrayBuffers[${_ArrayBuffers.length-1}]`;
+		} else if ( ev.data instanceof Blob ){
+			_Blobs.push(ev.data);
+			msg = `${ev.data.size} byte Blob!\r\n May Use Your Browser's Console to Catch it: _Blobs[${_Blobs.length-1}]`;
+		} else {
+			msg = (typeof ev.data === 'object') ? JSON.stringify(ev.data) : ev.data;
+		}
+		writeToScreen( msg, 'incoming');
+	}
+	function onError(ev){
+		var error_ = (ev && ev.data) ? ev.data : "Unidentified Error !";
+		writeToScreen(error_, 'error');
+	}
+	function doSend(){
+		if ( message.value.length > 0 ){
+			writeToScreen(message.value, 'outgoing');
+			WS.send(message.value);
+		}
+	}
+	function doSendBinary(send_as_blob){
+		var blob = document.querySelector('input[type="file"]').files[0];
+		if( send_as_blob ){
+			WS.binaryType = "blob";
+			WS.send(blob);
+			writeToScreen('♣ Blob Buffer Sent', 'outgoing');
+		} else {
+			var fileReader = new FileReader();
+			fileReader.onerror = writeToScreen.bind(null, 'Unable to Read File As Array Buffer', 'error');
+			fileReader.readAsArrayBuffer(blob);
+			fileReader.onload = function () {
+				writeToScreen('♠ Array Buffer Sent', 'outgoing');
+				WS.binaryType = "arraybuffer";
+				WS.send(fileReader.result);
+			}
+		}
+	}
+	function writeToScreen(message, class_name){
+		var p = document.createElement("p");
+		p.style.wordWrap = "break-word";
+		p.className = class_name;
+		p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
+		terminal.appendChild(p);
+		terminal.scrollTop = terminal.scrollHeight;
+	}
+	document.addEventListener("DOMContentLoaded", function() {
+		root = document.getRootNode().documentElement;
+		terminal = document.getElementById("terminal");
+		message = document.getElementById("message");
+		url = document.getElementById("url");
+		protocol = document.getElementById("protocol");
+		document.getElementById('dark-switcher').addEventListener('click', (ev)=>{
+			ev.preventDefault();
+			let is_dark = ( root.getAttribute('data-theme').indexOf('dark') === 0 ) ? true : false;
+			let theme_ = ( is_dark ? 'normal' : 'dark' );
+			root.setAttribute('data-theme', theme_);
+			localStorage._weasel_theme = theme_;
+		});
+		document.querySelector('input[type="button"][value="OPEN"]').addEventListener('click', createSocket.bind() );
+		document.querySelector('input[type="button"][value="CLOSE"]').addEventListener('click', ()=>{ if (WS) WS.close(); });
+		document.querySelector('input[type="button"][value="clear"]').addEventListener('click', ()=>{ terminal.innerText = ''; });
+		document.querySelector('input[type="button"][value="reset"]').addEventListener('click', ()=>{ message.value = ''; });
+		document.querySelector('input[type="submit"][value="send"]').addEventListener('click', (ev)=>{ ev.preventDefault(); doSend(); });
+		document.querySelector('#ws-construction').addEventListener('submit', (ev)=>{ ev.preventDefault(); doSend(); });
+		document.querySelector('input[type="button"][value="blob"]').addEventListener('click', doSendBinary.bind(null, true));
+		document.querySelector('input[type="button"][value="array"]').addEventListener('click', doSendBinary.bind(null, false));
+		// load preset settings
+		if( localStorage.hasOwnProperty('_weasel_theme') && typeof localStorage._weasel_theme === 'string' && localStorage._weasel_theme.length > 0 ) root.setAttribute('data-theme', localStorage._weasel_theme);
+		if( localStorage.hasOwnProperty('_weasel_last_used_url') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_url.length > 0 ) url.value = localStorage._weasel_last_used_url;
+		if( localStorage.hasOwnProperty('_weasel_last_used_protocol') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_protocol.length > 0 ) protocol.value =  localStorage._weasel_last_used_protocol;
+	});
+	</script>
+</head>
+<body>
+	<h1>Weasel</h1>
+	<h2>The WebSocket Client</h2>
+	<!-- Server to Connect -->
+	<form id="ws-construction">
+		<fieldset>
+			<legend>Connection</legend>
+			<label>URL:</label>
+			<input type=text id="url" value='ws://echo.websocket.org/'>
+			<label>Protocol:</label>
+			<input type=text id="protocol" value='' placeholder="WS sub-protocol">
+			<input type="button" value="OPEN">
+			<input type="button" value="CLOSE">
+		</fieldset>
+	</form>
+	<!-- Terminal! -->
+	<div id="terminal"></div>
+	<!-- Message Console -->
+	<form id="console">
+		<fieldset>
+			<legend>Message Console</legend>
+			<textarea type="text" id="message"></textarea>
+			<input type="submit" value="send">
+			<input type="button" value="reset">
+			<input type="button" value="clear">
+			<fieldset>
+				<legend>Binary</legend>
+				<input type="file">
+				<input type="button" value="blob">
+				<input type="button" value="array">
+			</fieldset>
+		</fieldset>
+	</form>
+	<a id="dark-switcher">Switch Dark Mode [ON/OFF]</a>
+	<div id="branding">
+		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019] </a>
+	</div>
+</body>
+</html>
