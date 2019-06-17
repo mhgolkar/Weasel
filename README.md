@@ -1,2 +1,0 @@
-# Weasel
-WebSocket Client
