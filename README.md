@@ -6,8 +6,13 @@ Note: Demo Works with WSS (Secured WS) Only. To Use with WS You May Fork/Downloa
 
 * Single HTML5 Document  
 * Modern Browsers  
-* Works Offline  
+* Works Offline (Local Dev)  
 * Dependency-free  
-* Memory Slots
+* Memory Slots  
+* Supports Sub-Protocols  
+* Supports Binary Communication  
 * Lightweight  
 * Eye-Friendly Light / Dark Theme ( One-Click Switch right under the 'Message Console' )  
+  
+Also available as :  
+[FireFox Extension](https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)
