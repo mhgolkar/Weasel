@@ -15,4 +15,6 @@ Note: Demo Works with WSS (Secured WS) Only. To Use with WS You May Fork/Downloa
 * Eye-Friendly Light / Dark Theme ( One-Click Switch right under the 'Message Console' )  
   
 Also available as :  
-[FireFox Extension](https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)
+[FireFox Extension](https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)  
+
+![](https://raw.githubusercontent.com/mhgolkar/Weasel/gh-pages/websocket-weasel-in-action.png)
