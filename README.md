@@ -17,4 +17,4 @@ Note: Demo Works with WSS (Secured WS) Only. To Use with WS You May Fork/Downloa
 Also available as :  
 [FireFox Extension](https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)  
 
-![](https://raw.githubusercontent.com/mhgolkar/Weasel/gh-pages/websocket-weasel-in-action.png)
+[![](https://raw.githubusercontent.com/mhgolkar/Weasel/gh-pages/websocket-weasel-in-action.png)](https://mhgolkar.github.io/Weasel/) 
