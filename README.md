@@ -23,6 +23,6 @@ Few Updates Including:
 - Default Theme is now Dark  
 - New Color Scheme for the Light Theme  
 - Store / Restore / Clear Memory Slots (localStorage)
-- Shortcut to Send Message [ CTRL + Enter ]  
+- Shortcut to Send Message [ Ctrl + Enter ]  
 
 [![](https://raw.githubusercontent.com/mhgolkar/Weasel/gh-pages/websocket-weasel-in-action.png)](https://mhgolkar.github.io/Weasel/) 
