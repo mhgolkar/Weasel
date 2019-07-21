@@ -1,32 +1,42 @@
 <!DOCTYPE html>
-<html  data-theme="normal">
+<html data-theme="dark">
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
 	<title>Weasel [The WebSocket Client]</title>
 	<script async defer src="https://buttons.github.io/buttons.js"></script>
 	<style>
+	/* general color scheme */
 	:root { /* light theme */
 		--color-0: rgb(254, 254, 254);
 		--color-1: rgb(255, 252, 222);
 		--color-2: rgb(26, 0, 52);
 		--color-3: rgb(43, 0, 0);
-		--color-4: rgb(16, 0, 40);
 	}
 	:root[data-theme^='dark'] { /* dark theme */
 		--color-0: rgb(0, 0, 0);
 		--color-1: rgb(26, 0, 52);
 		--color-2: rgb(255, 252, 222);
-		--color-3: rgb(19, 204, 129);
-		--color-4: rgb(0, 0, 0);
+		--color-3: rgb(255, 206, 97);
 	}
-	:root { /* terminal text color allways on kind of dark background */
+	/* terminal color scheme */
+	:root[data-theme^='dark'] {
+		--color-trm-bg: rgb(0, 0, 0);
 		--color-trm: rgb(255, 252, 222);
 		--color-opn: rgb(0, 255, 152);
 		--color-cls: rgb(255, 214, 0);
 		--color-err: rgb(255, 46, 46);
-		--color-out: #fe8e39;
-		--color-in: #24f3e2;
+		--color-out: rgb(254, 142, 57);
+		--color-in: rgb(37, 244, 227);
+	}
+	:root { /* light */
+		--color-trm-bg: rgb(255, 255, 255);
+		--color-trm: rgb(100, 10, 50);
+		--color-opn: rgb(0, 150, 0);
+		--color-cls: rgb(255, 0, 0);
+		--color-err: rgb(245, 46, 255);
+		--color-out: rgb(255, 115, 0);
+		--color-in: rgb(163, 0, 111);
 	}
 	:root {
 		background-color: var(--color-1);
@@ -78,6 +88,7 @@
 		height: 2.25rem;
 	}
 	textarea {
+		display: block;
 		width: 100%;
 		font-size: 1rem;
 		margin: 0.25rem 0;
@@ -88,15 +99,20 @@
 		color: var(--color-3);
 		border-width: 1px;
 		resize: vertical;
+		margin-bottom: 0.75rem;
+	}
+	fieldset {
+		display: block;
+		margin-top: 0.75rem;
 	}
 	#terminal {
 		overflow-x: hidden;
 		overflow-y: auto;
 		height: 30vh;
 		resize: vertical;
-		background-color: var(--color-4);
 		padding: 1rem;
 		font-size: 1rem;
+		background-color: var(--color-trm-bg);
 	}
 	#terminal p {
 		margin: 0;
@@ -132,7 +148,7 @@
 		bottom: 0;
 		left: 0;
 		filter: opacity(0.25);
-		border-bottom: dotted 3px var(--color-cls);
+		border-bottom: dotted 1px var(--color-cls);
 	}
 	#terminal p.error {
 		color: var(--color-err);
@@ -157,21 +173,31 @@
 		margin: 0 0.25rem;
 	}
 	#branding {
-		text-align: center;
 		width: 100%;
 		margin: 2rem 0;
+	}
+	#side-menu {
+		margin-top: 1rem;
+	}
+	#side-menu a {
+		margin-right: 2rem;
+		padding-bottom: 0.25rem;
+		line-height: 2rem;
+		vertical-align: middle;
+		border-bottom: 1px solid var(--color-2);
 	}
 	a {
 		color: var(--color-2);
 		text-decoration: none;
-		border-bottom: 2px solid var(--color-2);
 		cursor: pointer;
 	}
 	</style>
 	<script language="javascript" type="text/javascript">
 	var WS;
+	var MIN_ADJACENT_SLOTS_HUE_DIFF = 25;
 	var root, terminal, url, protocol, message, memory;
-	var _ArrayBuffers = [], _Blobs = [], _Memory = {};
+	var _ArrayBuffers = [], _Blobs = [], _Memory = {}, _Memory_order = [];
+	var last_used_memory_slot_color;
 	function createSocket() {
 		let supports = 'WebSocket' in window || 'MozWebSocket' in window;
 		if ( supports ){
@@ -226,7 +252,11 @@
 	function doSend(){
 		if ( message.value.length > 0 ){
 			writeToScreen(message.value, 'outgoing');
-			WS.send(message.value);
+			if (WS && WS.readyState === 1 ) {
+				WS.send(message.value);
+			} else {
+				writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
+			}
 		}
 	}
 	function doSendBinary(send_as_blob){
@@ -254,32 +284,61 @@
 		terminal.appendChild(p);
 		terminal.scrollTop = terminal.scrollHeight;
 	}
+	function colorIsNotClear(usedColor){
+		return (
+			_Memory.hasOwnProperty(usedColor) ||
+			( last_used_memory_slot_color != undefined &&
+				Math.abs(last_used_memory_slot_color - usedColor) < MIN_ADJACENT_SLOTS_HUE_DIFF
+			)
+		);
+	}
+	function appendMemorySlot(slotColor){
+		var memory_slot = document.createElement('li');
+		memory_slot.style.backgroundColor = `hsl(${slotColor},50%,50%)`;
+		memory_slot.id = `m-${slotColor}`;
+		memory_slot.addEventListener('click', remember.bind(null, slotColor));
+		memory_slot.addEventListener('contextmenu', forget.bind(null, slotColor));
+		memory.appendChild(memory_slot);
+	}
 	function memorize(){
 		if ( message.value.length > 0 ){
 			var randomHueID;
 			do { // make a unique color/id for the _Memory
 				randomHueID = Math.floor(Math.random() * 360) + 1;
-			} while ( _Memory.hasOwnProperty(randomHueID) );
+			} while ( colorIsNotClear(randomHueID) );
+			last_used_memory_slot_color = randomHueID;
 			_Memory[randomHueID] = message.value;
-			var memory_slot = document.createElement('li');
-			memory_slot.style.backgroundColor = `hsl(${randomHueID},50%,50%)`;
-			memory_slot.id = `m-${randomHueID}`;
-			memory_slot.addEventListener('click', remember.bind(null, randomHueID));
-			memory_slot.addEventListener('contextmenu', forget.bind(null, randomHueID));
-			memory.appendChild(memory_slot);
+			_Memory_order.push(randomHueID);
+			appendMemorySlot(randomHueID);
 		}
 	}
 	function remember(memorySlotID){
-			if ( _Memory.hasOwnProperty(memorySlotID) ){
-				message.value = _Memory[memorySlotID];
-			}
+		if ( _Memory.hasOwnProperty(memorySlotID) ){
+			message.value = _Memory[memorySlotID];
+		}
 	}
 	function forget(memorySlotID, event){
-			if (event) event.preventDefault();
-			if ( _Memory.hasOwnProperty(memorySlotID) ){
-				delete _Memory[memorySlotID];
-				document.getElementById(`m-${memorySlotID}`).remove();
-			}
+		if (event) event.preventDefault();
+		if ( _Memory.hasOwnProperty(memorySlotID) ){
+			delete _Memory[memorySlotID];
+			var slot_index = _Memory_order.indexOf(memorySlotID);
+			_Memory_order.splice(slot_index, 1);
+			document.getElementById(`m-${memorySlotID}`).remove();
+		}
+	}
+	function storeMemorySlots(){
+		var memory_slots_to_store = {
+			order: _Memory_order,
+			slots: _Memory
+		}
+		localStorage._weasel_stored_memory_slots = JSON.stringify(memory_slots_to_store);
+		writeToScreen('Memory Slots Stored', 'opening');
+	}
+	function clearStorage(){
+		var current_theme = localStorage._weasel_theme;
+		localStorage.clear(); // but keep the theme ...
+		localStorage._weasel_theme = current_theme;
+		writeToScreen('Storage Cleared', 'error');
 	}
 	document.addEventListener("DOMContentLoaded", function() {
 		root = document.getRootNode().documentElement;
@@ -288,35 +347,53 @@
 		url = document.getElementById("url");
 		protocol = document.getElementById("protocol");
 		memory = document.getElementById("memory");
-		document.getElementById('dark-switcher').addEventListener('click', (ev)=>{
+		message.value = ''; // clear text area
+		document.getElementById('dark-switcher').addEventListener('click', function(ev){
 			ev.preventDefault();
 			let is_dark = ( root.getAttribute('data-theme').indexOf('dark') === 0 ) ? true : false;
 			let theme_ = ( is_dark ? 'normal' : 'dark' );
 			root.setAttribute('data-theme', theme_);
 			localStorage._weasel_theme = theme_;
 		});
+		document.getElementById('store-memory').addEventListener('click', storeMemorySlots.bind());
+		document.getElementById('clear-storage').addEventListener('click', clearStorage.bind());
 		document.querySelector('input[type="button"][value="OPEN"]').addEventListener('click', createSocket.bind() );
-		document.querySelector('input[type="button"][value="CLOSE"]').addEventListener('click', ()=>{ if (WS) WS.close(); });
-		document.querySelector('input[type="submit"][value="send"]').addEventListener('click', (ev)=>{ ev.preventDefault(); doSend(); });
-		document.querySelector('input[type="button"][value="reset"]').addEventListener('click', ()=>{ message.value = ''; });
-		document.querySelector('input[type="button"][value="clear"]').addEventListener('click', ()=>{ terminal.innerText = ''; });
+		document.querySelector('input[type="button"][value="CLOSE"]').addEventListener('click', function(){ if (WS) WS.close(); });
+		document.querySelector('input[type="submit"][value="send"]').addEventListener('click', function(ev){ ev.preventDefault(); doSend(); });
+		document.querySelector('input[type="button"][value="reset"]').addEventListener('click', function(){ message.value = ''; });
+		document.querySelector('input[type="button"][value="clear"]').addEventListener('click', function(){ terminal.innerText = ''; });
 		document.querySelector('input[type="button"][value="M+"]').addEventListener('click', memorize);
-		document.querySelector('#ws-construction').addEventListener('submit', (ev)=>{ ev.preventDefault(); doSend(); });
+		document.querySelector('#ws-construction').addEventListener('submit', function(ev){ ev.preventDefault(); doSend(); });
 		document.querySelector('input[type="button"][value="blob"]').addEventListener('click', doSendBinary.bind(null, true));
 		document.querySelector('input[type="button"][value="array"]').addEventListener('click', doSendBinary.bind(null, false));
-		// load preset settings
+		// reload stored settings, memory, etc.
 		if( localStorage.hasOwnProperty('_weasel_theme') && typeof localStorage._weasel_theme === 'string' && localStorage._weasel_theme.length > 0 ) root.setAttribute('data-theme', localStorage._weasel_theme);
 		if( localStorage.hasOwnProperty('_weasel_last_used_url') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_url.length > 0 ) url.value = localStorage._weasel_last_used_url;
 		if( localStorage.hasOwnProperty('_weasel_last_used_protocol') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_protocol.length > 0 ) protocol.value =  localStorage._weasel_last_used_protocol;
+		if( localStorage.hasOwnProperty('_weasel_stored_memory_slots') && typeof localStorage._weasel_stored_memory_slots === 'string' && localStorage._weasel_stored_memory_slots.length > 0 ){
+			var parsed_memory_slots_storage =  JSON.parse(localStorage._weasel_stored_memory_slots);
+			_Memory =  parsed_memory_slots_storage.slots;
+			_Memory_order = parsed_memory_slots_storage.order;
+			for (var color = 0; color < _Memory_order.length; color++) {
+				appendMemorySlot( _Memory_order[color] );
+			}
+		}
+		// shortcuts
+		window.onkeyup = function(event) {
+			if( event.ctrlKey && event.keyCode == 13 ) { // ctrl + Enter -> send text message
+				event.preventDefault();
+				doSend();
+			}
+		};
 	});
-	</script>
+</script>
 </head>
 <body>
 	<h1>Weasel</h1>
 	<h2>The WebSocket Client</h2>
 	<div> <!-- Github Buttons -->
 		<a class="github-button" href="https://github.com/mhgolkar" data-size="large" aria-label="Follow @mhgolkar on GitHub">Follow @mhgolkar</a>
-		<a class="github-button" href="https://github.com/mhgolkar/Weasel" data-icon="octicon-star" data-size="large" aria-label="Star mhgolkar/Weasel on GitHub">Star</a>
+		<a class="github-button" href="https://github.com/mhgolkar/Weasel" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star mhgolkar/Weasel on GitHub">Star</a>
 		<a class="github-button" href="https://github.com/mhgolkar/Weasel/fork" data-icon="octicon-repo-forked" data-size="large" aria-label="Fork mhgolkar/Weasel on GitHub">Fork</a>
 	</div>
 	<!-- Server to Connect -->
@@ -351,7 +428,11 @@
 			</fieldset>
 		</fieldset>
 	</form>
-	<a id="dark-switcher">Switch Dark Mode [ON/OFF]</a>
+	<div id="side-menu">
+		<a id="dark-switcher">Switch Dark Mode [ON/OFF]</a>
+		<a id="store-memory">Store Memory Slots</a>
+		<a id="clear-storage">Clear Storage All</a>
+	</div>
 	<div id="branding">
 		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019] </a>
 	</div>
