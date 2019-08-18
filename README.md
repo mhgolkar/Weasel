@@ -9,6 +9,7 @@ Note: Demo Works with WSS (Secured WS) Only. To Use with WS You May Fork/Downloa
 * Modern Browsers  
 * Works Offline (Local Dev)  
 * Dependency-free  
+* Embeddable  
 * Colorized Memory Slots  
 * Supports Sub-Protocols  
 * Supports Binary Communication  
@@ -22,7 +23,13 @@ also available as :
 Few Updates Including:  
 - Default Theme is now Dark  
 - New Color Scheme for the Light Theme  
-- Store / Restore / Clear Memory Slots (localStorage)
+- Store / Restore / Clear Memory Slots (localStorage)  
 - Shortcut to Send Message [ Ctrl + Enter ]  
+
+### v1.3.0
+Better Binary Support & Other Minor Improvements:  
+- Shows Name, Type and Size of the Sent/Received Binary  
+- Detects Major File Formats using file Signatures (Magic Numbers)  
+- Shows Links which help Preview received Binaries Easier (Save or Open in new tab)  
 
 [![](https://raw.githubusercontent.com/mhgolkar/Weasel/gh-pages/websocket-weasel-in-action.png)](https://mhgolkar.github.io/Weasel/) 
