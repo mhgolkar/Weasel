@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
-	<title>Weasel [The WebSocket Client]</title> <!-- v1.2.0 -->
+	<title>Weasel [The WebSocket Client]</title> <!-- v1.3.0 -->
 	<script async defer src="https://buttons.github.io/buttons.js"></script>
 	<style>
 	/* general color scheme */
@@ -57,10 +57,16 @@
 	body > :first-child {
 		margin-top: 1.5rem !important;
 	}
-	h1, h2 {
+	h1 {
 		margin: 0.5rem 0 0.25rem 0;
 	}
-	h1, h2 {
+	h2 {
+		margin: 0.5rem 0 1.5rem 0;
+	}
+	a {
+		color: var(--color-2);
+		text-decoration: none;
+		cursor: pointer;
 	}
 	form, fieldset, div {
 		width: 100%;
@@ -117,7 +123,12 @@
 	#terminal p {
 		margin: 0;
 		margin-top: 1px;
+		margin-left: 4.5rem;
+		text-indent: -4.5rem;
 		line-height: 1.5rem;
+		word-wrap: break-word;
+		word-break: break-all;
+		white-space: normal;
 		color: var(--color-trm);
 	}
 	#terminal p:last-of-type {
@@ -159,6 +170,19 @@
 	#terminal p.outgoing {
 		color: var(--color-out);
 	}
+	#terminal p.binary-links {
+		margin: auto;
+		margin-left: 4.75rem;
+		text-indent: 0rem; /* reset */
+		font-size: 0.9rem;
+		color: var(--color-in);
+	}
+	#terminal p.binary-links a, #terminal p.binary-links span {
+		color: inherit;
+		border-bottom: solid 1px var(--color-in);
+		margin: auto 0.5rem;
+		cursor: pointer;
+	}
 	#memory { /* ol */
 		display: inline-block;
 		list-style: none;
@@ -172,10 +196,6 @@
 		border: solid 1px var(--color-2);
 		margin: 0 0.25rem;
 	}
-	#branding {
-		width: 100%;
-		margin: 2rem 0;
-	}
 	#side-menu {
 		margin-top: 1rem;
 	}
@@ -186,20 +206,29 @@
 		vertical-align: middle;
 		border-bottom: 1px solid var(--color-2);
 	}
-	a {
-		color: var(--color-2);
-		text-decoration: none;
-		cursor: pointer;
+	#branding {
+		width: 100%;
+		margin: 0;
+		margin-top: 3rem;
+		margin-bottom: 1.5rem;
 	}
 	</style>
 	<script language="javascript" type="text/javascript">
 	var WS;
 	var MIN_ADJACENT_SLOTS_HUE_DIFF = 25;
+	var FORMAT_BY_MAGIC_NUMBERS = {
+		'89504E47':'png', '47494638':'gif', '25504446':'pdf', 'FFD8FFDB': 'jpg', 'FFD8FFEE':'jpg', '4F676753':'ogg', '38425053':'psd',
+		'FFD8FFE0':'jpg', 'FFD8FFE1':'jpg', '49492A00':'tif', '4D4D002A':'tif', '53445058':'dpx', '58504453':'dpx', '7B5C7274':'rtf',
+		'504B0304':'zip', '52617221':'rar', 'EDABEEDB':'rpm', '54444624':'tdf', '54444546':'tdef', '762F3101':'exr', '425047FB':'bpg',
+		'57415645':'wav', '41564920':'avi', '664C6143':'flac', '4D546864':'midi', '75737461':'tar', '377ABCAF':'7z', 'FD377A58':'xz',
+		'464C4946':'flif', '1A45DFA3':'mkv', '41542654':'djv', '774F4646':'woff', '774F4632':'woff2', '3C3F786D':'xml', '0061736D':'asm',
+		'213C6172':'deb', '000001BA':'mpg', '000001B3':'mpg', '1B4C7561':'luac'
+	};
 	var root, terminal, url, protocol, message, memory;
 	var _ArrayBuffers = [], _Blobs = [], _Memory = {}, _Memory_order = [];
 	var last_used_memory_slot_color;
 	function createSocket() {
-		let supports = 'WebSocket' in window || 'MozWebSocket' in window;
+		var supports = 'WebSocket' in window || 'MozWebSocket' in window;
 		if ( supports ){
 			if ( url.value.length > 0 ) {
 				try {
@@ -208,10 +237,10 @@
 					} else {
 						WS = window['MozWebSocket'] ? new MozWebSocket(url.value) : new WebSocket(url.value);
 					}
-					WS.onopen = function(ev) { onOpen(ev) };
-					WS.onclose = function(ev) { onClose(ev) };
-					WS.onmessage = function(ev) { onMessage(ev) };
-					WS.onerror = function(ev) { onError(ev) };
+					WS.onopen = function(ev) { onOpen(ev); };
+					WS.onclose = function(ev) { onClose(ev); };
+					WS.onmessage = function(ev) { onMessage(ev); };
+					WS.onerror = function(ev) { onError(ev); };
 					writeToScreen(`CONNECTING [ ${ url.value.toUpperCase() } ]`, 'url');
 				} catch(err){
 					writeToScreen('Unable to Create Socket! ' + err.message, 'error');
@@ -233,26 +262,32 @@
 		writeToScreen("CONNECTION CLOSED!", 'closing');
 	}
 	function onMessage(ev){
-		let msg;
+		var msg, bin_group, bin_position;
 		if ( ev.data instanceof ArrayBuffer ){
+			bin_group = '_ArrayBuffers';
+			bin_position = _ArrayBuffers.length;
 			_ArrayBuffers.push(ev.data);
-			msg = `${ev.data.byteLength} byte ArrayBuffer!\r\n May Use Your Browser's Console to Catch it: _ArrayBuffers[${_ArrayBuffers.length-1}]`;
+			msg = `${ev.data.byteLength} byte ArrayBuffer!`;
 		} else if ( ev.data instanceof Blob ){
+			bin_group = '_Blobs';
+			bin_position = _Blobs.length;
 			_Blobs.push(ev.data);
-			msg = `${ev.data.size} byte Blob!\r\n May Use Your Browser's Console to Catch it: _Blobs[${_Blobs.length-1}]`;
+			msg = `${ev.data.size} byte Blob!`;
 		} else {
 			msg = (typeof ev.data === 'object') ? JSON.stringify(ev.data) : ev.data;
 		}
 		writeToScreen( msg, 'incoming');
+		if (bin_position !== undefined) makeBinaryLink(bin_group, bin_position);
 	}
 	function onError(ev){
-		var error_ = (ev && ev.data) ? ev.data : "Unidentified Error !";
+		console.log(ev);
+		var error_ = (ev && ev.data) ? ev.data : "The Connection is Abruptly Closed or Couldn't be Opened !";
 		writeToScreen(error_, 'error');
 	}
 	function doSend(){
 		if ( message.value.length > 0 ){
-			writeToScreen(message.value, 'outgoing');
 			if (WS && WS.readyState === 1 ) {
+				writeToScreen(message.value, 'outgoing');
 				WS.send(message.value);
 			} else {
 				writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
@@ -260,29 +295,103 @@
 		}
 	}
 	function doSendBinary(send_as_blob){
-		var blob = document.querySelector('input[type="file"]').files[0];
-		if( send_as_blob ){
-			WS.binaryType = "blob";
-			WS.send(blob);
-			writeToScreen('♣ Blob Buffer Sent', 'outgoing');
-		} else {
-			var fileReader = new FileReader();
-			fileReader.onerror = writeToScreen.bind(null, 'Unable to Read File As Array Buffer', 'error');
-			fileReader.readAsArrayBuffer(blob);
-			fileReader.onload = function () {
-				writeToScreen('♠ Array Buffer Sent', 'outgoing');
-				WS.binaryType = "arraybuffer";
-				WS.send(fileReader.result);
+		var file = document.querySelector('input[type="file"]').files[0];
+		if (WS && WS.readyState === 1 ){
+			if ( typeof file === 'object' ){
+				if( send_as_blob ){
+					WS.binaryType = "blob";
+					WS.send(file);
+					writeToScreen(`♣ Blob Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
+				} else {
+					var fileReader = new FileReader();
+					fileReader.onerror = writeToScreen.bind(null, 'Unable to Read File As Array Buffer', 'error');
+					fileReader.readAsArrayBuffer(file);
+					fileReader.onload = function (ev) {
+						if (ev.target.readyState === FileReader.DONE){
+							WS.binaryType = "arraybuffer";
+							WS.send(fileReader.result);
+							writeToScreen(`♠ Array Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
+						}
+					};
+				}
+			} else {
+				writeToScreen('No File Selected!', 'error');
 			}
+		} else {
+			writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
 		}
 	}
 	function writeToScreen(message, class_name){
 		var p = document.createElement("p");
-		p.style.wordWrap = "break-word";
 		p.className = class_name;
 		p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
 		terminal.appendChild(p);
 		terminal.scrollTop = terminal.scrollHeight;
+	}
+	function magicallyFindType(magic_slice, bin){
+		var uint = new Uint8Array(magic_slice);
+		var bytes = [];
+		uint.forEach( function(byte){
+			bytes.push( byte.toString(16) );
+		});
+		var hex = bytes.join('').toUpperCase();
+		bin.magic_number = hex;
+		return ( FORMAT_BY_MAGIC_NUMBERS.hasOwnProperty(hex) ) ? FORMAT_BY_MAGIC_NUMBERS[hex] : 'bin';
+	}
+	function makeBinaryLink(bin_group, bin_position){
+		var blob;
+		var bin = window[bin_group][bin_position];
+		if ( bin instanceof Blob ){
+			blob = bin;
+		} else if ( bin instanceof ArrayBuffer ) {
+			blob = new Blob( [bin] );
+		}
+		var link = window.URL.createObjectURL(blob);
+		var extension;
+		if ( typeof blob.type === 'string' && blob.type.length > 0 ){
+			extension = blob.type;
+		} else {
+			if ( bin instanceof Blob ){
+				var filereader = new FileReader();
+				filereader.onloadend = function(ev) {
+					if (ev.target.readyState === FileReader.DONE) {
+						extension = magicallyFindType(ev.target.result, bin);
+						writeBinaryLinks(link, bin_group, bin_position, extension);
+					}
+				};
+				var magic_part = bin.slice(0, 4);
+				filereader.readAsArrayBuffer(magic_part);
+			} else if ( bin instanceof ArrayBuffer ){
+				var magic_slice = bin.slice(0, 4);
+				extension = magicallyFindType(magic_slice, bin);
+				writeBinaryLinks(link, bin_group, bin_position, extension);
+			} else {
+				writeBinaryLinks(link, bin_group, bin_position, extension);
+			}
+		}
+	}
+	function writeBinaryLinks(link, bin_group, bin_position, extension){
+		var bin_title = `${bin_group}[${bin_position}]`;
+		var links = document.createElement("p");
+		links.innerText = `${bin_title} :: ${extension.toUpperCase()} `;
+		var download = document.createElement("a");
+			download.setAttribute('download', `${bin_title}.${extension}`);
+			download.href = link;
+			download.innerText = 'SAVE ⮟';
+			links.appendChild(download);
+		var open = document.createElement("a");
+			open.target = '_blank';
+			open.href = link;
+			open.innerText = 'OPEN ⯁';
+			links.appendChild(open);
+		var print = document.createElement("span");
+			print.innerText = 'LOG ☷';
+			print.addEventListener('click', function(){
+				console.log(bin_title, window[bin_group][bin_position]);
+			});
+			links.appendChild(print);
+		links.className = 'binary-links';
+		terminal.appendChild(links);
 	}
 	function colorIsNotClear(usedColor){
 		return (
@@ -330,7 +439,7 @@
 		var memory_slots_to_store = {
 			order: _Memory_order,
 			slots: _Memory
-		}
+		};
 		localStorage._weasel_stored_memory_slots = JSON.stringify(memory_slots_to_store);
 		writeToScreen('Memory Slots Stored', 'opening');
 	}
@@ -350,8 +459,8 @@
 		message.value = ''; // clear text area
 		document.getElementById('dark-switcher').addEventListener('click', function(ev){
 			ev.preventDefault();
-			let is_dark = ( root.getAttribute('data-theme').indexOf('dark') === 0 ) ? true : false;
-			let theme_ = ( is_dark ? 'normal' : 'dark' );
+			var is_dark = ( root.getAttribute('data-theme').indexOf('dark') === 0 ) ? true : false;
+			var theme_ = ( is_dark ? 'normal' : 'dark' );
 			root.setAttribute('data-theme', theme_);
 			localStorage._weasel_theme = theme_;
 		});
@@ -434,7 +543,7 @@
 		<a id="clear-storage">Clear Storage All</a>
 	</div>
 	<div id="branding">
-		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019] </a>
+		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.3.0] </a>
 	</div>
 </body>
 </html>
