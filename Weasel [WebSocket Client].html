@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
-	<title>Weasel [The WebSocket Client]</title> <!-- v1.3.0 -->
+	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.0 -->
 	<style>
 	/* general color scheme */
 	:root { /* light theme */
@@ -29,13 +29,26 @@
 		--color-in: rgb(37, 244, 227);
 	}
 	:root { /* light */
-		--color-trm-bg: rgb(255, 255, 255);
+		--color-trm-bg: rgb(250, 250, 250);
 		--color-trm: rgb(100, 10, 50);
 		--color-opn: rgb(0, 150, 0);
 		--color-cls: rgb(255, 0, 0);
 		--color-err: rgb(245, 46, 255);
-		--color-out: rgb(255, 115, 0);
-		--color-in: rgb(163, 0, 111);
+		--color-out: rgb(203, 49, 0);
+		--color-in: rgb(54, 0, 65);
+	}
+	/* syntax highlighting color scheme */
+	:root[data-theme^='dark'] {
+		--color-highlight-string: rgb(0, 255, 152);
+		--color-highlight-number: rgb(255, 115, 0);
+		--color-highlight-boolean: rgb(255, 214, 0);
+		--color-highlight-null: rgb(0, 150, 0);
+	}
+	:root { /* light */
+		--color-highlight-string: rgb(0, 54, 32);
+		--color-highlight-number: rgb(199, 36, 0);
+		--color-highlight-boolean: rgb(65, 0, 158);
+		--color-highlight-null: rgb(0, 150, 0);
 	}
 	:root {
 		background-color: var(--color-1);
@@ -130,9 +143,6 @@
 		white-space: normal;
 		color: var(--color-trm);
 	}
-	#terminal p:last-of-type {
-		margin-bottom: 4rem;
-	}
 	#terminal p::before {
 		margin: auto 2rem;
 		font-size: 1.25rem;
@@ -182,6 +192,14 @@
 		margin: auto 0.5rem;
 		cursor: pointer;
 	}
+	#terminal .json span:not(.key) { font-style: italic; }
+	#terminal .json .string { color: var(--color-highlight-string); }
+	#terminal .json .number { color: var(--color-highlight-number); }
+	#terminal .json .boolean { color: var(--color-highlight-boolean); }
+	#terminal .json .null { color: var(--color-highlight-null); }
+	#terminal p:last-of-type {
+		margin-bottom: 4rem;
+	}
 	#memory { /* ol */
 		display: inline-block;
 		list-style: none;
@@ -213,7 +231,7 @@
 	}
 	</style>
 	<script language="javascript" type="text/javascript">
-	var WS;
+	var DEFAULT_THEME = 'dark';
 	var MIN_ADJACENT_SLOTS_HUE_DIFF = 25;
 	var FORMAT_BY_MAGIC_NUMBERS = {
 		'89504E47':'png', '47494638':'gif', '25504446':'pdf', 'FFD8FFDB': 'jpg', 'FFD8FFEE':'jpg', '4F676753':'ogg', '38425053':'psd',
@@ -223,11 +241,15 @@
 		'464C4946':'flif', '1A45DFA3':'mkv', '41542654':'djv', '774F4646':'woff', '774F4632':'woff2', '3C3F786D':'xml', '0061736D':'asm',
 		'213C6172':'deb', '000001BA':'mpg', '000001B3':'mpg', '1B4C7561':'luac'
 	};
+	var WS;
 	var root, terminal, url, protocol, message, memory;
-	var _ArrayBuffers = [], _Blobs = [], _Memory = {}, _Memory_order = [];
-	var last_used_memory_slot_color;
+	var _ArrayBuffers = [], _Blobs = [], _JSONs = [], _Memory = {}, _Memory_order = [];
+	var last_used_memory_slot_color, last_remembered_slot;
 	function createSocket() {
 		var supports = 'WebSocket' in window || 'MozWebSocket' in window;
+		if (WS && 'readyState' in WS && WS.readyState === 1 ){
+			writeToScreen('Existing Connection Overrode...', 'error');
+		}
 		if ( supports ){
 			if ( url.value.length > 0 ) {
 				try {
@@ -258,7 +280,7 @@
 		writeToScreen('CONNECTION READY', 'opening');
 	}
 	function onClose(ev){
-		writeToScreen("CONNECTION CLOSED!", 'closing');
+		writeToScreen('CONNECTION CLOSED!', 'closing');
 	}
 	function onMessage(ev){
 		var msg, bin_group, bin_position;
@@ -298,7 +320,7 @@
 		if (WS && WS.readyState === 1 ){
 			if ( typeof file === 'object' ){
 				if( send_as_blob ){
-					WS.binaryType = "blob";
+					WS.binaryType = 'blob';
 					WS.send(file);
 					writeToScreen(`♣ Blob Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
 				} else {
@@ -307,7 +329,7 @@
 					fileReader.readAsArrayBuffer(file);
 					fileReader.onload = function (ev) {
 						if (ev.target.readyState === FileReader.DONE){
-							WS.binaryType = "arraybuffer";
+							WS.binaryType = 'arraybuffer';
 							WS.send(fileReader.result);
 							writeToScreen(`♠ Array Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
 						}
@@ -321,11 +343,45 @@
 		}
 	}
 	function writeToScreen(message, class_name){
-		var p = document.createElement("p");
-		p.className = class_name;
-		p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
+		var is_json, pretty_print;
+		if ( typeof message === 'string' && '{['.indexOf(message.trim()[0]) !== -1 ){
+			try {
+				var object = JSON.parse(message);
+				pretty_print = JSON.stringify(object, undefined, 3);
+				if (class_name === 'incoming') _JSONs.push(object);
+				is_json = true;
+			} catch(err){
+				is_json = false;
+			}
+		}
+		var p = document.createElement('p');
+		if ( is_json === true ) {
+			p.innerHTML = `<pre>\t${(class_name === 'incoming' ? syntaxHighlight(pretty_print) : pretty_print)}\t</pre>`;
+			p.className = `${class_name} json`;
+		} else {
+			p.className = class_name;
+			p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
+		}
 		terminal.appendChild(p);
 		terminal.scrollTop = terminal.scrollHeight;
+	}
+	function syntaxHighlight(json) {
+		var syntax_highlighted_json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		return syntax_highlighted_json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+			var type = 'number';
+			if (/^"/.test(match)) {
+				if (/:$/.test(match)) {
+					type = 'key';
+				} else {
+					type = 'string';
+				}
+			} else if (/true|false/.test(match)) {
+				type = 'boolean';
+			} else if (/null/.test(match)) {
+				type = 'null';
+			}
+			return `<span class="${type}">${match}</span>`;
+		});
 	}
 	function magicallyFindType(magic_slice, bin){
 		var uint = new Uint8Array(magic_slice);
@@ -371,19 +427,19 @@
 	}
 	function writeBinaryLinks(link, bin_group, bin_position, extension){
 		var bin_title = `${bin_group}[${bin_position}]`;
-		var links = document.createElement("p");
+		var links = document.createElement('p');
 		links.innerText = `${bin_title} :: ${extension.toUpperCase()} `;
-		var download = document.createElement("a");
+		var download = document.createElement('a');
 			download.setAttribute('download', `${bin_title}.${extension}`);
 			download.href = link;
 			download.innerText = 'SAVE ⮟';
 			links.appendChild(download);
-		var open = document.createElement("a");
+		var open = document.createElement('a');
 			open.target = '_blank';
 			open.href = link;
 			open.innerText = 'OPEN ⯁';
 			links.appendChild(open);
-		var print = document.createElement("span");
+		var print = document.createElement('span');
 			print.innerText = 'LOG ☷';
 			print.addEventListener('click', function(){
 				console.log(bin_title, window[bin_group][bin_position]);
@@ -416,13 +472,28 @@
 			} while ( colorIsNotClear(randomHueID) );
 			last_used_memory_slot_color = randomHueID;
 			_Memory[randomHueID] = message.value;
+			last_remembered_slot = _Memory_order.length;
 			_Memory_order.push(randomHueID);
 			appendMemorySlot(randomHueID);
 		}
 	}
-	function remember(memorySlotID){
+	function remember(memorySlotID, remembered_index){
 		if ( _Memory.hasOwnProperty(memorySlotID) ){
 			message.value = _Memory[memorySlotID];
+			if( remembered_index == undefined || remembered_index >= _Memory_order.length ) last_remembered_slot = _Memory_order.indexOf(memorySlotID);
+		}
+	}
+	function rememberRoll(){
+		var slots_count = _Memory_order.length;
+		if ( slots_count > 0 ){
+			if (typeof last_remembered_slot !== 'number' || last_remembered_slot >= (slots_count - 1)){
+				last_remembered_slot = 0;
+			} else {
+				last_remembered_slot++;
+			}
+			remember(_Memory_order[last_remembered_slot], last_remembered_slot);
+		} else {
+			writeToScreen('No Memory Slot to Rotate!', 'error');
 		}
 	}
 	function forget(memorySlotID, event){
@@ -450,11 +521,11 @@
 	}
 	document.addEventListener("DOMContentLoaded", function() {
 		root = document.getRootNode().documentElement;
-		terminal = document.getElementById("terminal");
-		message = document.getElementById("message");
-		url = document.getElementById("url");
-		protocol = document.getElementById("protocol");
-		memory = document.getElementById("memory");
+		terminal = document.getElementById('terminal');
+		message = document.getElementById('message');
+		url = document.getElementById('url');
+		protocol = document.getElementById('protocol');
+		memory = document.getElementById('memory');
 		message.value = ''; // clear text area
 		document.getElementById('dark-switcher').addEventListener('click', function(ev){
 			ev.preventDefault();
@@ -475,7 +546,12 @@
 		document.querySelector('input[type="button"][value="blob"]').addEventListener('click', doSendBinary.bind(null, true));
 		document.querySelector('input[type="button"][value="array"]').addEventListener('click', doSendBinary.bind(null, false));
 		// reload stored settings, memory, etc.
-		if( localStorage.hasOwnProperty('_weasel_theme') && typeof localStorage._weasel_theme === 'string' && localStorage._weasel_theme.length > 0 ) root.setAttribute('data-theme', localStorage._weasel_theme);
+		if( localStorage.hasOwnProperty('_weasel_theme') && typeof localStorage._weasel_theme === 'string' && localStorage._weasel_theme.length > 0 ) {
+			root.setAttribute('data-theme', localStorage._weasel_theme);
+		} else {
+			root.setAttribute('data-theme', DEFAULT_THEME);
+			localStorage._weasel_theme = DEFAULT_THEME;
+		}
 		if( localStorage.hasOwnProperty('_weasel_last_used_url') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_url.length > 0 ) url.value = localStorage._weasel_last_used_url;
 		if( localStorage.hasOwnProperty('_weasel_last_used_protocol') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_protocol.length > 0 ) protocol.value =  localStorage._weasel_last_used_protocol;
 		if( localStorage.hasOwnProperty('_weasel_stored_memory_slots') && typeof localStorage._weasel_stored_memory_slots === 'string' && localStorage._weasel_stored_memory_slots.length > 0 ){
@@ -488,9 +564,25 @@
 		}
 		// shortcuts
 		window.onkeyup = function(event) {
-			if( event.ctrlKey && event.keyCode == 13 ) { // ctrl + Enter -> send text message
+			if( event.ctrlKey ) { // ctrl + ...
 				event.preventDefault();
-				doSend();
+				switch (event.keyCode) {
+					case 13: // Enter
+						doSend(); // -> send text message
+						break;
+					case 77:
+						if (event.altKey) { // alt + m
+							rememberRoll();
+						} else { // m
+							memorize();
+						}
+						break;
+					case 66:
+						if (event.altKey) { // alt + b
+							doSendBinary(true);
+						}
+						break;
+				}
 			}
 		};
 	});
@@ -504,9 +596,9 @@
 		<fieldset>
 			<legend>Connection</legend>
 			<label>URL:</label>
-			<input type=text id="url" value='ws://echo.websocket.org/'>
+			<input type="text" id="url" value="wss://echo.websocket.org/">
 			<label>Protocol:</label>
-			<input type=text id="protocol" value='' placeholder="WS sub-protocol">
+			<input type="text" id="protocol" value="" placeholder="WS sub-protocol">
 			<input type="button" value="OPEN">
 			<input type="button" value="CLOSE">
 		</fieldset>
@@ -537,7 +629,7 @@
 		<a id="clear-storage">Clear Storage All</a>
 	</div>
 	<div id="branding">
-		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.3.0] </a>
+		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.4.0] </a>
 	</div>
 </body>
 </html>
