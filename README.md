@@ -46,4 +46,5 @@ Better Binary Support & Other Minor Improvements:
 ### v1.4.0
 - JSON Syntax Highlighting  
 - New Key Bindings
-- Othe Minor Updates
+- Other Minor Improvements
+- Fixing Unsafe assignment to innerHTML (v1.4.1)
