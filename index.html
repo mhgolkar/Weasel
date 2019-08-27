@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
-	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.0 -->
+	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.1 -->
 	<script async defer src="https://buttons.github.io/buttons.js"></script>
 	<style>
 	/* general color scheme */
@@ -343,6 +343,7 @@
 			writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
 		}
 	}
+	var DOM_Parser = new DOMParser();
 	function writeToScreen(message, class_name){
 		var is_json, pretty_print;
 		if ( typeof message === 'string' && '{['.indexOf(message.trim()[0]) !== -1 ){
@@ -357,8 +358,12 @@
 		}
 		var p = document.createElement('p');
 		if ( is_json === true ) {
-			p.innerHTML = `<pre>\t${(class_name === 'incoming' ? syntaxHighlight(pretty_print) : pretty_print)}\t</pre>`;
 			p.className = `${class_name} json`;
+			var parsed_syntax_highlighted = DOM_Parser.parseFromString(`<pre>\t${(class_name === 'incoming' ? syntaxHighlight(pretty_print) : pretty_print)}\t</pre>`, "text/html");
+			var pre_contents = parsed_syntax_highlighted.getElementsByTagName('pre');
+			for (var tag of pre_contents) {
+				p.appendChild(tag);
+			}
 		} else {
 			p.className = class_name;
 			p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
