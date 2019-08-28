@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
-	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.1 -->
+	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.2 -->
 	<script async defer src="https://buttons.github.io/buttons.js"></script>
 	<style>
 	/* general color scheme */
@@ -36,20 +36,22 @@
 		--color-cls: rgb(255, 0, 0);
 		--color-err: rgb(245, 46, 255);
 		--color-out: rgb(203, 49, 0);
-		--color-in: rgb(54, 0, 65);
+		--color-in: rgb(64, 0, 98);
 	}
 	/* syntax highlighting color scheme */
 	:root[data-theme^='dark'] {
 		--color-highlight-string: rgb(0, 255, 152);
+		--color-highlight-string-out: rgb(255, 69, 0);
 		--color-highlight-number: rgb(255, 115, 0);
 		--color-highlight-boolean: rgb(255, 214, 0);
 		--color-highlight-null: rgb(0, 150, 0);
 	}
 	:root { /* light */
 		--color-highlight-string: rgb(0, 54, 32);
+		--color-highlight-string-out: rgb(203, 36, 0);
 		--color-highlight-number: rgb(199, 36, 0);
 		--color-highlight-boolean: rgb(65, 0, 158);
-		--color-highlight-null: rgb(0, 150, 0);
+		--color-highlight-null: rgb(46, 73, 46);
 	}
 	:root {
 		background-color: var(--color-1);
@@ -137,6 +139,7 @@
 		margin: 0;
 		margin-top: 1px;
 		margin-left: 4.5rem;
+		margin-right: 0.5rem;
 		text-indent: -4.5rem;
 		line-height: 1.5rem;
 		word-wrap: break-word;
@@ -193,8 +196,18 @@
 		margin: auto 0.5rem;
 		cursor: pointer;
 	}
+	#terminal .json span {
+		word-wrap: break-word;
+		word-break: break-all;
+		white-space: normal;
+	}
+	#terminal .json pre {
+		margin: 0 auto;
+		width: 100%;
+	}
 	#terminal .json span:not(.key) { font-style: italic; }
-	#terminal .json .string { color: var(--color-highlight-string); }
+	#terminal .json.incoming .string { color: var(--color-highlight-string); }
+	#terminal .json.outgoing .string { color: var(--color-highlight-string-out); }
 	#terminal .json .number { color: var(--color-highlight-number); }
 	#terminal .json .boolean { color: var(--color-highlight-boolean); }
 	#terminal .json .null { color: var(--color-highlight-null); }
@@ -359,7 +372,7 @@
 		var p = document.createElement('p');
 		if ( is_json === true ) {
 			p.className = `${class_name} json`;
-			var parsed_syntax_highlighted = DOM_Parser.parseFromString(`<pre>\t${(class_name === 'incoming' ? syntaxHighlight(pretty_print) : pretty_print)}\t</pre>`, "text/html");
+			var parsed_syntax_highlighted = DOM_Parser.parseFromString(`<pre>\t${ syntaxHighlight(pretty_print) }\t</pre>`, "text/html");
 			var pre_contents = parsed_syntax_highlighted.getElementsByTagName('pre');
 			for (var tag of pre_contents) {
 				p.appendChild(tag);
@@ -640,7 +653,7 @@
 		<a id="clear-storage">Clear Storage All</a>
 	</div>
 	<div id="branding">
-		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.4.0] </a>
+		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.4.2] </a>
 	</div>
 </body>
 </html>
