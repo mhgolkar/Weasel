@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
-	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.2 -->
+	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.3 -->
 	<style>
 	/* general color scheme */
 	:root { /* light theme */
@@ -258,35 +258,40 @@
 	var root, terminal, url, protocol, message, memory;
 	var _ArrayBuffers = [], _Blobs = [], _JSONs = [], _Memory = {}, _Memory_order = [];
 	var last_used_memory_slot_color, last_remembered_slot;
+	var TIME_MACHINE_CAPACITY = 75, time_machine = [], time_machine_index = 0;
+	var auto_scroll = true, auto_scroll_marker;
 	function createSocket() {
-		var supports = 'WebSocket' in window || 'MozWebSocket' in window;
 		if (WS && 'readyState' in WS && WS.readyState === 1 ){
+			WS.onclose = function(ev) { onClose(ev); createSocket(); };
 			writeToScreen('Existing Connection Overrode...', 'error');
-		}
-		if ( supports ){
-			if ( url.value.length > 0 ) {
-				try {
-					if( protocol.value.length > 0 ) {
-						WS = window['MozWebSocket'] ? new MozWebSocket(url.value, protocol.value) : new WebSocket(url.value, protocol.value);
-					} else {
-						WS = window['MozWebSocket'] ? new MozWebSocket(url.value) : new WebSocket(url.value);
-					}
-					WS.onopen = function(ev) { onOpen(ev); };
-					WS.onclose = function(ev) { onClose(ev); };
-					WS.onmessage = function(ev) { onMessage(ev); };
-					WS.onerror = function(ev) { onError(ev); };
-					writeToScreen(`CONNECTING [ ${ url.value.toUpperCase() } ]`, 'url');
-				} catch(err){
-					writeToScreen('Unable to Create Socket! ' + err.message, 'error');
-				}
-			} else {
-				writeToScreen('We Need a URL to Connect!', 'error');
-			}
-			// also save the last configs to the storage
-			localStorage._weasel_last_used_protocol = protocol.value;
-			localStorage._weasel_last_used_url = url.value;
+			WS.close();
 		} else {
-			writeToScreen("This Browser Doesn't Support WebSocket!", 'error');
+			var supports = 'WebSocket' in window || 'MozWebSocket' in window;
+			if ( supports ){
+				if ( url.value.length > 0 ) {
+					try {
+						if( protocol.value.length > 0 ) {
+							WS = window['MozWebSocket'] ? new MozWebSocket(url.value, protocol.value) : new WebSocket(url.value, protocol.value);
+						} else {
+							WS = window['MozWebSocket'] ? new MozWebSocket(url.value) : new WebSocket(url.value);
+						}
+						WS.onopen = function(ev) { onOpen(ev); };
+						WS.onclose = function(ev) { onClose(ev); };
+						WS.onmessage = function(ev) { onMessage(ev); };
+						WS.onerror = function(ev) { onError(ev); };
+						writeToScreen(`CONNECTING [ ${ url.value.toUpperCase() } ]`, 'url');
+					} catch(err){
+						writeToScreen('Unable to Create Socket! ' + err.message, 'error');
+					}
+				} else {
+					writeToScreen('We Need a URL to Connect!', 'error');
+				}
+				// also save the last configs to the storage
+				localStorage._weasel_last_used_protocol = protocol.value;
+				localStorage._weasel_last_used_url = url.value;
+			} else {
+				writeToScreen("This Browser Doesn't Support WebSocket!", 'error');
+			}
 		}
 	}
 	function onOpen(ev){
@@ -323,6 +328,7 @@
 			if (WS && WS.readyState === 1 ) {
 				writeToScreen(message.value, 'outgoing');
 				WS.send(message.value);
+				keepHistory(message.value);
 			} else {
 				writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
 			}
@@ -381,7 +387,11 @@
 			p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
 		}
 		terminal.appendChild(p);
-		terminal.scrollTop = terminal.scrollHeight;
+		if(auto_scroll) terminal.scrollTop = terminal.scrollHeight;
+	}
+	function switchAutoScroll(){
+		auto_scroll = !auto_scroll;
+		auto_scroll_marker.innerText = auto_scroll ? '⚫' : '⚪';
 	}
 	function syntaxHighlight(json) {
 		var syntax_highlighted_json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -479,6 +489,7 @@
 		memory_slot.style.backgroundColor = `hsl(${slotColor},50%,50%)`;
 		memory_slot.id = `m-${slotColor}`;
 		memory_slot.addEventListener('click', remember.bind(null, slotColor));
+		memory_slot.addEventListener('dblclick', remember.bind(null, slotColor, undefined, true));
 		memory_slot.addEventListener('contextmenu', forget.bind(null, slotColor));
 		memory.appendChild(memory_slot);
 	}
@@ -495,10 +506,11 @@
 			appendMemorySlot(randomHueID);
 		}
 	}
-	function remember(memorySlotID, remembered_index){
+	function remember(memorySlotID, remembered_index, also_send){
 		if ( _Memory.hasOwnProperty(memorySlotID) ){
 			message.value = _Memory[memorySlotID];
 			if( remembered_index == undefined || remembered_index >= _Memory_order.length ) last_remembered_slot = _Memory_order.indexOf(memorySlotID);
+			if (also_send === true) doSend();
 		}
 	}
 	function rememberRoll(){
@@ -514,11 +526,29 @@
 			writeToScreen('No Memory Slot to Rotate!', 'error');
 		}
 	}
+	function keepHistory(sent_message){
+		time_machine_index = 0;
+		time_machine.unshift(sent_message);
+		if (time_machine.length > TIME_MACHINE_CAPACITY) time_machine.pop();
+	}
+	function timeMachine( direction ){
+		if ( time_machine.length > 0 ){
+			// time_machine_index[0] is the last recent record
+			if (direction === true && time_machine_index < (time_machine.length - 1)){ // backward
+				time_machine_index++;
+			}
+			if (direction === false && time_machine_index > 0) { // forward
+				time_machine_index--;
+			}
+			message.value = time_machine[time_machine_index];
+		}
+	}
 	function forget(memorySlotID, event){
 		if (event) event.preventDefault();
 		if ( _Memory.hasOwnProperty(memorySlotID) ){
 			delete _Memory[memorySlotID];
 			var slot_index = _Memory_order.indexOf(memorySlotID);
+			if (last_remembered_slot == slot_index) last_remembered_slot = undefined;
 			_Memory_order.splice(slot_index, 1);
 			document.getElementById(`m-${memorySlotID}`).remove();
 		}
@@ -544,6 +574,7 @@
 		url = document.getElementById('url');
 		protocol = document.getElementById('protocol');
 		memory = document.getElementById('memory');
+		auto_scroll_marker = document.querySelector('#switch-auto-scroll span');
 		message.value = ''; // clear text area
 		document.getElementById('dark-switcher').addEventListener('click', function(ev){
 			ev.preventDefault();
@@ -554,6 +585,7 @@
 		});
 		document.getElementById('store-memory').addEventListener('click', storeMemorySlots.bind());
 		document.getElementById('clear-storage').addEventListener('click', clearStorage.bind());
+		document.getElementById('switch-auto-scroll').addEventListener('click', switchAutoScroll.bind());
 		document.querySelector('input[type="button"][value="OPEN"]').addEventListener('click', createSocket.bind() );
 		document.querySelector('input[type="button"][value="CLOSE"]').addEventListener('click', function(){ if (WS) WS.close(); });
 		document.querySelector('input[type="submit"][value="send"]').addEventListener('click', function(ev){ ev.preventDefault(); doSend(); });
@@ -593,6 +625,16 @@
 							rememberRoll();
 						} else { // m
 							memorize();
+						}
+						break;
+					case 90:
+						if (event.altKey) { // alt + z
+							timeMachine(true); // backward
+						}
+						break;
+					case 88:
+						if (event.altKey) { // alt + x
+							timeMachine(false); // forward
 						}
 						break;
 					case 66:
@@ -642,12 +684,13 @@
 		</fieldset>
 	</form>
 	<div id="side-menu">
-		<a id="dark-switcher">Switch Dark Mode [ON/OFF]</a>
+		<a id="dark-switcher">Switch Dark Mode</a>
 		<a id="store-memory">Store Memory Slots</a>
 		<a id="clear-storage">Clear Storage All</a>
+		<a id="switch-auto-scroll">Switch Autoscroll <span>⚫</span></a>
 	</div>
 	<div id="branding">
-		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.4.2] </a>
+		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.4.3] </a>
 	</div>
 </body>
 </html>
