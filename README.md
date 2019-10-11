@@ -15,7 +15,8 @@ Note: Demo Works with WSS (Secured WS) Only. To Use with WS You May Fork/Downloa
 * Supports Binary Communication  
 * Syntax Highlighting (JSON)  
 * Lightweight  
-* Eye-Friendly Light / Dark Theme ( One-Click Switch right under the 'Message Console' )  
+* Eye-Friendly Light / Dark Theme   
+* Sent Message History   
   
 also available as :  
 **[FireFox Add-on](https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)**  
@@ -27,7 +28,10 @@ also available as :
 `Ctrl + Alt + B` to Send Selected Binary  
 `Ctrl + M` Memorize  
 `Ctrl + Alt + M` Remember Next Memory Slot  
-Note: Right Click on a Memory Slot to Remove it  
+Right Click on a Memory Slot to Remove it  
+Double Click on a Memory Slot to Remember and Send it   
+`Ctrl + Alt + Z` Move Backward in the Sent Message History   
+`Ctrl + Alt + X` Move Forward in the Sent Message History   
 
 ## Changelog
 ### v1.2.0
@@ -43,8 +47,10 @@ Better Binary Support & Other Minor Improvements:
 - Detects Major File Formats using file Signatures (Magic Numbers)  
 - Shows Links which help Preview received Binaries Easier (Save or Open in new tab)  
 
-### v1.4.0
+### v1.4.x
 - JSON Syntax Highlighting  
 - New Key Bindings
 - Other Minor Improvements
 - Fixing Unsafe assignment to innerHTML (v1.4.1)
+- Sent Message History (v1.4.3)
+- Switch Autoscroll (v1.4.3)
