@@ -3,7 +3,7 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta charset="UTF-8">
-	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.3 -->
+	<title>Weasel [The WebSocket Client]</title> <!-- v1.4.4 -->
 	<style>
 	/* general color scheme */
 	:root { /* light theme */
@@ -61,10 +61,11 @@
 		width: 100vw;
 	}
 	body {
-		width: 90%;
-		margin-left: 2.5%;
+		width: 95vw;
+		margin-left 2.5vw;
+		padding: 0;
 		overflow-x: hidden;
-		box-sizing: content-box;
+		box-sizing: border-box;
 		border: none; outline: none;
 		padding: 0.25rem 1rem;
 	}
@@ -110,6 +111,7 @@
 	textarea {
 		display: block;
 		width: 100%;
+		height: 16vh;
 		font-size: 1rem;
 		margin: 0.25rem 0;
 		padding: 1rem;
@@ -123,32 +125,33 @@
 	}
 	fieldset {
 		display: block;
+		box-sizing: border-box;
 		margin-top: 0.75rem;
 	}
 	#terminal {
 		overflow-x: hidden;
 		overflow-y: auto;
-		height: 30vh;
+		height: 40vh;
 		resize: vertical;
-		padding: 1rem;
+		padding: 1em;
 		font-size: 1rem;
 		background-color: var(--color-trm-bg);
 	}
 	#terminal p {
 		margin: 0;
 		margin-top: 1px;
-		margin-left: 4.5rem;
-		margin-right: 0.5rem;
-		text-indent: -4.5rem;
-		line-height: 1.5rem;
+		margin-left: 4.5em;
+		margin-right: 0.5em;
+		text-indent: -4.5em;
+		line-height: 1.5em;
 		word-wrap: break-word;
 		word-break: break-all;
 		white-space: normal;
 		color: var(--color-trm);
 	}
 	#terminal p::before {
-		margin: auto 2rem;
-		font-size: 1.25rem;
+		margin: auto 2em;
+		font-size: 1.25em;
 	}
 	#terminal p.outgoing::before { content: '▲'; }
 	#terminal p.incoming::before { content: '▼'; }
@@ -165,7 +168,7 @@
 	#terminal p.closing::after {
 		content: '';
 		width: 100%;
-		margin: 1.5rem 0; /* a gap between each dialogue */
+		margin: 1.5em 0; /* a gap between each dialogue */
 		display: block;
 		position: relative;
 		bottom: 0;
@@ -184,15 +187,15 @@
 	}
 	#terminal p.binary-links {
 		margin: auto;
-		margin-left: 4.75rem;
-		text-indent: 0rem; /* reset */
-		font-size: 0.9rem;
+		margin-left: 4.75em;
+		text-indent: 0em; /* reset */
+		font-size: 0.9em;
 		color: var(--color-in);
 	}
 	#terminal p.binary-links a, #terminal p.binary-links span {
 		color: inherit;
 		border-bottom: solid 1px var(--color-in);
-		margin: auto 0.5rem;
+		margin: auto 0.5em;
 		cursor: pointer;
 	}
 	#terminal .json span {
@@ -216,15 +219,15 @@
 	#memory { /* ol */
 		display: inline-block;
 		list-style: none;
-		padding: 0 1rem;
-		margin: 0;
+		padding: 0;
+		margin: 0.25rem 0;
 	}
 	#memory li {
 		display: inline-block;
 		vertical-align: middle;
 		width: 1.5rem; height: 1.5rem;
 		border: solid 1px var(--color-2);
-		margin: 0 0.25rem;
+		margin: 0.3rem;
 	}
 	#side-menu {
 		margin-top: 1rem;
@@ -241,6 +244,37 @@
 		margin: 0;
 		margin-top: 3rem;
 		margin-bottom: 1.5rem;
+	}
+	/* More Mobile Friendly / Responsive Styling */
+	@media only screen and (orientation: portrait) and (max-device-width: 480px){
+		#ws-construction input[type=text] {
+			display: block;
+			margin-bottom: 0.5rem;
+			width: 90%;
+		}
+		input[type='file'] {
+			max-width: 70vw;
+			display: block;
+		}
+	  #terminal p {
+			font-size: 0.9rem;
+			margin-left: 2.5em;
+		}
+		#terminal p.binary-links {
+			margin-left: 3.75em;
+		}
+		textarea {
+			font-size: 0.9rem;
+		}
+		#side-menu a:before {
+			content: '• ';
+			filter: opacity(0.3);
+		}
+		#side-menu a {
+			display: inline-block;
+			padding: 0; margin: 0;
+			border: none;
+		}
 	}
 	</style>
 	<script language="javascript" type="text/javascript">
@@ -588,10 +622,12 @@
 		document.getElementById('switch-auto-scroll').addEventListener('click', switchAutoScroll.bind());
 		document.querySelector('input[type="button"][value="OPEN"]').addEventListener('click', createSocket.bind() );
 		document.querySelector('input[type="button"][value="CLOSE"]').addEventListener('click', function(){ if (WS) WS.close(); });
-		document.querySelector('input[type="submit"][value="send"]').addEventListener('click', function(ev){ ev.preventDefault(); doSend(); });
-		document.querySelector('input[type="button"][value="reset"]').addEventListener('click', function(){ message.value = ''; });
-		document.querySelector('input[type="button"][value="clear"]').addEventListener('click', function(){ terminal.innerText = ''; });
+		document.querySelector('input[type="submit"][value="Send"]').addEventListener('click', function(ev){ ev.preventDefault(); doSend(); });
+		document.querySelector('input[type="button"][value="R"]').addEventListener('click', function(){ message.value = ''; });
+		document.querySelector('input[type="button"][value="C"]').addEventListener('click', function(){ terminal.innerText = ''; });
 		document.querySelector('input[type="button"][value="M+"]').addEventListener('click', memorize);
+		document.querySelector('input[type="button"][value="↶"]').addEventListener('click', timeMachine.bind(null, true));
+		document.querySelector('input[type="button"][value="↷"]').addEventListener('click', timeMachine.bind(null, false));
 		document.querySelector('#ws-construction').addEventListener('submit', function(ev){ ev.preventDefault(); doSend(); });
 		document.querySelector('input[type="button"][value="blob"]').addEventListener('click', doSendBinary.bind(null, true));
 		document.querySelector('input[type="button"][value="array"]').addEventListener('click', doSendBinary.bind(null, false));
@@ -646,7 +682,7 @@
 			}
 		};
 	});
-</script>
+	</script>
 </head>
 <body>
 	<h1>Weasel</h1>
@@ -670,10 +706,12 @@
 		<fieldset>
 			<legend>Message Console</legend>
 			<textarea type="text" id="message"></textarea>
-			<input type="submit" value="send">
-			<input type="button" value="reset">
-			<input type="button" value="clear">
-			<input type="button" value="M+">
+			<input type="submit" value="Send">
+			<input type="button" value="R" title="Reset Input">
+			<input type="button" value="C" title="Clear Terminal">
+			<input type="button" value="↶" title="History Backward">
+			<input type="button" value="↷" title="History Forward">
+			<input type="button" value="M+" title="Memorize">
 			<ol id="memory"></ol>
 			<fieldset>
 				<legend>Binary</legend>
@@ -690,7 +728,7 @@
 		<a id="switch-auto-scroll">Switch Autoscroll <span>⚫</span></a>
 	</div>
 	<div id="branding">
-		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.4.3] </a>
+		<a href="https://github.com/mhgolkar"> ♥ Mor. H. Golkar [2019 v1.4.4] </a>
 	</div>
 </body>
 </html>
