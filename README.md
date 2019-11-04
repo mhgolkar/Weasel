@@ -54,3 +54,4 @@ Better Binary Support & Other Minor Improvements:
 - Fixing Unsafe assignment to innerHTML (v1.4.1)
 - Sent Message History (v1.4.3)
 - Switch Autoscroll (v1.4.3)
+- More Responsive, Mobile-Friendly Design (v1.4.4)
