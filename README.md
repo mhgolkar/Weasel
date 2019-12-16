@@ -32,6 +32,9 @@ Right Click on a Memory Slot to Remove it
 Double Click on a Memory Slot to Remember and Send it   
 `Ctrl + Alt + Z` Move Backward in the Sent Message History   
 `Ctrl + Alt + X` Move Forward in the Sent Message History   
+`Ctrl + Alt + Enter` Open/Override Socket   
+`Ctrl + Alt + S` Switch Autoscroll   
+`Ctrl + <numeral key>` Remembers Memory Slots by Index (e.g. Ctrl+0 recalls the first memory)   
 
 ## Changelog
 ### v1.2.0
@@ -49,9 +52,15 @@ Better Binary Support & Other Minor Improvements:
 
 ### v1.4.x
 - JSON Syntax Highlighting  
-- New Key Bindings
-- Other Minor Improvements
-- Fixing Unsafe assignment to innerHTML (v1.4.1)
-- Sent Message History (v1.4.3)
-- Switch Autoscroll (v1.4.3)
-- More Responsive, Mobile-Friendly Design (v1.4.4)
+- New Key Bindings   
+- Other Minor Improvements   
+- Fixing Unsafe assignment to innerHTML (v1.4.1)   
+- Sent Message History (v1.4.3)   
+- Switch Autoscroll (v1.4.3)   
+- More Responsive, Mobile-Friendly Design (v1.4.4)   
+
+### v2
+- Total UI retouch   
+- New shortcuts   
+- Better support for multiple sub-protocols (comma separated)   
+- Better support for mobile devices   
