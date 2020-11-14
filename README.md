@@ -36,31 +36,3 @@ Double Click on a Memory Slot to Remember and Send it
 `Ctrl + Alt + S` Switch Autoscroll   
 `Ctrl + <numeral key>` Remembers Memory Slots by Index (e.g. Ctrl+0 recalls the first memory)   
 
-## Changelog
-### v1.2.0
-Few Updates Including:  
-- Default Theme is now Dark  
-- New Color Scheme for the Light Theme  
-- Store / Restore / Clear Memory Slots (localStorage)  
-- Shortcut to Send Message [ Ctrl + Enter ]  
-
-### v1.3.0
-Better Binary Support & Other Minor Improvements:  
-- Shows Name, Type and Size of the Sent/Received Binary  
-- Detects Major File Formats using file Signatures (Magic Numbers)  
-- Shows Links which help Preview received Binaries Easier (Save or Open in new tab)  
-
-### v1.4.x
-- JSON Syntax Highlighting  
-- New Key Bindings   
-- Other Minor Improvements   
-- Fixing Unsafe assignment to innerHTML (v1.4.1)   
-- Sent Message History (v1.4.3)   
-- Switch Autoscroll (v1.4.3)   
-- More Responsive, Mobile-Friendly Design (v1.4.4)   
-
-### v2
-- Total UI retouch   
-- New shortcuts   
-- Better support for multiple sub-protocols (comma separated)   
-- Better support for mobile devices   
