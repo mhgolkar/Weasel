@@ -3,18 +3,18 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta charset="UTF-8">
-		<title>Weasel</title> <!-- v2 -->
+		<title>Weasel</title> <!-- v2.1 -->
 		<style>
 		/* general color scheme */
 		:root { /* light theme */
 			--color-0: rgb(255, 255, 255);
-			--color-1: rgb(255, 251, 166);
+			--color-1: rgb(249, 249, 250);
 			--color-2: rgb(26, 0, 52);
 			--color-3: rgb(43, 0, 0);
-			--color-4: rgb(218, 216, 82);
+			--color-4: rgb(230, 230, 230);
 			--color-5: rgb(128, 0, 0);
-			--color-6: rgb(146, 66, 66);
-			--color-7: rgb(73, 111, 58);
+			--color-6: rgb(90, 90, 90);
+			--color-7: rgb(170, 170, 170);
 		}
 		:root[data-theme^='dark'] { /* dark theme */
 			--color-0: rgb(0, 0, 0);
@@ -37,25 +37,25 @@
 			--color-in: rgb(37, 244, 227);
 		}
 		:root { /* light */
-			--color-trm-bg: rgb(247, 247, 247);
-			--color-trm: rgb(100, 10, 50);
-			--color-opn: rgb(0, 150, 0);
+			--color-trm-bg: rgb(255, 255, 255);
+			--color-trm: rgb(107, 0, 50);
+			--color-opn: rgb(0, 150, 150);
 			--color-cls: rgb(255, 0, 0);
-			--color-err: rgb(245, 46, 255);
-			--color-out: rgb(203, 49, 0);
-			--color-in: rgb(64, 0, 98);
+			--color-err: rgb(116, 0, 122);
+			--color-out: rgb(0, 150, 0);
+			--color-in: rgb(45, 0, 70);
 		}
 		/* syntax highlighting color scheme */
 		:root[data-theme^='dark'] {
 			--color-highlight-string: rgb(0, 255, 152);
-			--color-highlight-string-out: rgb(255, 69, 0);
+			--color-highlight-string-out: rgb(0, 219, 110);
 			--color-highlight-number: rgb(255, 115, 0);
 			--color-highlight-boolean: rgb(255, 214, 0);
 			--color-highlight-null: rgb(0, 150, 0);
 		}
 		:root { /* light */
-			--color-highlight-string: rgb(0, 54, 32);
-			--color-highlight-string-out: rgb(203, 36, 0);
+			--color-highlight-string: rgb(0, 0, 0);
+			--color-highlight-string-out: rgb(0, 29, 17);
 			--color-highlight-number: rgb(199, 36, 0);
 			--color-highlight-boolean: rgb(65, 0, 158);
 			--color-highlight-null: rgb(46, 73, 46);
@@ -67,6 +67,10 @@
 			color: var(--color-2);
 			font-size: 16px;
 			font-weight: 400;
+			--font-weight-headings: 300;
+			--font-weight-terminal: 400;
+			--font-weight-buttons: 900;
+			--font-weight-buttons-secondary: 400;
 			width: 100vw;
 			line-height: 1.15; /* Correct the line height in all browsers */
 			/* NOTE: to Prevent adjustments of font size after orientation changes in iOS : */
@@ -87,13 +91,13 @@
 		}
 		h1 {
 			font-size: 1.5rem;
-			font-weight: 100;
+			font-weight: var(--font-weight-headings);
 			margin: 0.5rem 0 0.25rem;
 		}
 		h2 {
 			font-size: 1rem;
 			margin: 0.5rem 0 1.5rem;
-			font-weight: 100;
+			font-weight: var(--font-weight-headings);
 		}
 		h2 span {
 			font-size: 0.75em;
@@ -149,7 +153,7 @@
 		}
 		input[type='button'], input[type='submit'] {
 			font-size: 1rem;
-			font-weight: 900;
+			font-weight: var(--font-weight-buttons);
 			height: 1.75rem;
 			padding: 0.25rem 0.75rem;
 			border-radius: 0.25rem;
@@ -202,10 +206,10 @@
 			color: var(--color-6);
 			/* currections mainly for Edge and IE */
 			box-sizing: border-box;
-			color: inherit;
 			display: table;
 			max-width: 100%;
-			padding: 0;
+			font-size: 0.9em;
+			padding: 0 0.25em;
 			white-space: normal;
 		}
 		#ws-construction fieldset {
@@ -218,6 +222,7 @@
 			resize: vertical;
 			padding: 1em;
 			font-size: 0.9rem;
+			font-weight: var(--font-weight-terminal);
 			background-color: var(--color-trm-bg);
 		}
 		/* scrollbars */
@@ -397,7 +402,7 @@
 			vertical-align: middle;
 			font-size: 1rem;
 			margin: 0.25rem 0.25rem;
-			font-weight: 100;
+			font-weight: var(--font-weight-buttons-secondary);
 			padding: 0.25rem 0.5rem;
 			border-radius: 0.25rem;
 			border: none;
@@ -897,7 +902,7 @@
 	</head>
 	<body>
 		<h1>Weasel</h1>
-		<h2>The WebSocket Client <span>v2</span></h2>
+		<h2>The WebSocket Client <span>v2.1</span></h2>
 		<!-- Server to Connect -->
 		<form id="ws-construction">
 			<fieldset>
