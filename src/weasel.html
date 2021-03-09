@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html  data-theme="dark">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+	<title>Weasel</title>
+	<link rel="icon" href="./icon.svg">
+	<link rel="stylesheet" href="./weasel.css">
+	<script language="javascript" type="text/javascript" src="./weasel.js"></script>
+</head>
+<body>
+	<h1>Weasel</h1>
+	<h2>The WebSocket Client <span>v2.1</span></h2>
+	<!-- Server to Connect -->
+	<form id="ws-construction">
+		<fieldset>
+			<legend>Connection</legend>
+			<label>URL:</label>
+			<input type="text" id="url" value="wss://echo.websocket.org/" placeholder="ws/wss url">
+			<label>Protocol:</label>
+			<input type="text" id="protocol" value="" placeholder="ws sub-protocol(s)" title="Sub-Protocols (Comma Separated)">
+			<input type="submit" value="OPEN" title="Open Connection (Ctrl + Alt + Enter)">
+			<input type="button" value="CLOSE">
+		</fieldset>
+	</form>
+	<!-- Terminal! -->
+	<div id="terminal"></div>
+	<!-- Message Console -->
+	<form id="console">
+		<fieldset>
+			<legend>Message Console</legend>
+			<textarea type="text" id="message"></textarea>
+			<input type="button" value="SEND" title="Send Message (Ctrl + Enter)">
+			<input type="button" value="R" title="Reset Input">
+			<input type="button" value="C" title="Clear Terminal">
+			<input type="button" value="<" title="History Backward (Ctrl + Alt + Z)">
+			<input type="button" value=">" title="History Forward (Ctrl + Alt + X)">
+			<input type="button" value="M+" title="Memorize (Ctrl + M)">
+			<ol id="memory"></ol>
+			<fieldset>
+				<legend>Binary</legend>
+				<div id="file-selector">
+					<label id="file-selector-botton" for="file-input"><span>Browse</span><span id="file-name">No File Selected.</span></label>
+					<input id="file-input" type="file">
+				</div>
+				<input type="button" value="blob">
+				<input type="button" value="array">
+			</fieldset>
+		</fieldset>
+	</form>
+	<div id="side-menu">
+		<a id="dark-switcher">Switch Dark Mode</a>
+		<a id="store-memory">Store Memory Slots</a>
+		<a id="clear-storage">Clear Storage All</a>
+		<a id="switch-auto-scroll">Switch Autoscroll <span>⚫</span></a>
+	</div>
+	<div id="branding">
+		<a href="https://github.com/mhgolkar" target="_blank"> ♥ Mor. H. Golkar </a>
+	</div>
+</body>
+</html>
