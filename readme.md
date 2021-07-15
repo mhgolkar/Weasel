@@ -1,38 +1,47 @@
 # Weasel
-**WebSocket Client / Console**   
+**WebSocket Client / Console**
 
-An In-Browser Helper Console for WS Test and Developement    
-Check out its github.io page for a [working demo](https://mhgolkar.github.io/Weasel/)  
-Note: Demo Works with WSS (Secured WS) Only. To Use with WS You May Fork/Download the Weasel.  
+In-Browser Helper Console for WS Test and Developement
 
-* Single HTML5 Document  
-* Modern Browsers  
-* Works Offline (Local Dev)  
-* Dependency-free  
-* Embeddable  
-* Colorized Memory Slots  
-* Supports Sub-Protocols  
-* Supports Binary Communication  
-* Syntax Highlighting (JSON)  
-* Lightweight  
-* Eye-Friendly Light / Dark Theme   
-* Sent Message History   
-  
-also available as :  
-**[FireFox Add-on](https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)**  
+* Lightweight
+* Dependency-free & Embeddable
+* Works Offline (Local) in Modern Browsers
+* Supports Binary and textual communication
+* Syntax Highlighting (JSON)
+* Supports Sub-Protocols
+* Eye-Friendly Light / Dark Theme
+* Colorized Memory Slots
+* Message History
+
+Check out its github page for a [working demo](https://mhgolkar.github.io/Weasel/)  
+> Online demo may only work with WSS (Secured WS;)
+> To use with WS it's recommended to download the repo or use the [Firefox Add-on].  
+
+Also available as:
+
++ **[Firefox Add-on]**
+
+> Files in the `./src` directory consist the source of the Firefox add-on.  
+> If you want to just use the tool, `./weasel.html` file is the only file you need.
 
 [![](https://raw.githubusercontent.com/mhgolkar/Weasel/gh-pages/websocket-weasel-in-action.png)](https://mhgolkar.github.io/Weasel/) 
 
+
 ## Tips
-`Ctrl + Enter` to Send Text Message  
-`Ctrl + Alt + B` to Send Selected Binary  
-`Ctrl + M` Memorize  
-`Ctrl + Alt + M` Remember Next Memory Slot  
-Right Click on a Memory Slot to Remove it  
-Double Click on a Memory Slot to Remember and Send it   
-`Ctrl + Alt + Z` Move Backward in the Sent Message History   
-`Ctrl + Alt + X` Move Forward in the Sent Message History   
-`Ctrl + Alt + Enter` Open/Override Socket   
-`Ctrl + Alt + S` Switch Autoscroll   
-`Ctrl + <numeral key>` Remembers Memory Slots by Index (e.g. Ctrl+0 recalls the first memory)   
+
++ `Ctrl + Enter` to Send Text Message
++ `Ctrl + Alt + B` to Send Selected Binary
++ `Ctrl + M` Memorize
++ `Ctrl + Alt + M` Remember Next Memory Slot
++ Right Click on a Memory Slot to Remove it
++ Double Click on a Memory Slot to Remember and Send it
++ `Ctrl + Alt + Z` Move Backward in the Sent Message History
++ `Ctrl + Alt + X` Move Forward in the Sent Message History
++ `Ctrl + Alt + Enter` Open/Override Socket
++ `Ctrl + Alt + S` Switch Autoscroll
++ `Ctrl + <numeral key>` Remembers Memory Slots by Index
+    > e.g. `Ctrl+0` recalls the first memory
+
+<!-- Refs -->
+[Firefox Add-on]: (https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)
 
