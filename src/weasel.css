@@ -1,4 +1,3 @@
-/* Weasel */
 /* general color scheme */
 :root { /* light theme */
 	--color-0: rgb(255, 255, 255);
@@ -66,9 +65,9 @@
 	--font-weight-buttons: 900;
 	--font-weight-buttons-secondary: 400;
 	width: 100vw;
-	line-height: 1.15; /* Correct the line height in all browsers */
-	/* NOTE: To prevent adjustments of font size after orientation changes in iOS : */
+	line-height: 1.15; /* correct the line height in all browsers */
 	/* -webkit-text-size-adjust: 100%; */
+	/* 🡡 to prevent adjustments of font size after orientation changes in iOS : */
 }
 body {
 	padding: 0; margin: 0; /* reset */
@@ -151,7 +150,7 @@ input[type='button'], input[type='submit'] {
 	height: 1.75rem;
 	padding: 0.25rem 0.75rem;
 	border-radius: 0.25rem;
-	border: none;
+	border: solid 1px var(--color-4);
 	background-color: var(--color-4);
 	color: var(--color-5);
 	cursor: pointer;
@@ -171,6 +170,10 @@ input[type='button']:active, input[type='submit']:active {
 	color: var(--color-0);
 	background-color: var(--color-5);
 }
+textarea:focus, input:focus {
+	outline: none;
+	border-color: var(--color-5);
+}
 textarea {
 	display: block;
 	width: 100%;
@@ -181,7 +184,9 @@ textarea {
 	margin: 0.25rem 0;
 	padding: 1rem;
 	box-sizing: border-box;
+	outline: none;
 	border: solid 1px var(--color-6);
+	border-radius: 0.25rem;
 	background-color: var(--color-0);
 	color: var(--color-3);
 	resize: vertical;
@@ -219,7 +224,6 @@ legend {
 	font-weight: var(--font-weight-terminal);
 	background-color: var(--color-trm-bg);
 }
-/* scrollbars */
 #terminal, textarea#message { /* firefox */
 	scrollbar-color: var(--color-7) var(--color-trm-bg);
 	scrollbar-width: thin;
@@ -423,7 +427,7 @@ fieldset fieldset:last-of-type { /* binary */
 	color: var(--color-6);
 	filter: opacity(0.25);
 }
-/* More Mobile Friendly / Responsive Styling */
+/* more mobile friendly / responsive styling */
 @media only screen and (orientation: portrait) and (max-device-width: 480px){
 	#ws-construction input[type=text] {
 		display: block;

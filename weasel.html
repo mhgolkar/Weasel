@@ -3,7 +3,7 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta charset="UTF-8">
-		<title>Weasel</title> <!-- v2.1 -->
+		<title>Weasel</title>
 		<style>
 		/* general color scheme */
 		:root { /* light theme */
@@ -72,9 +72,9 @@
 			--font-weight-buttons: 900;
 			--font-weight-buttons-secondary: 400;
 			width: 100vw;
-			line-height: 1.15; /* Correct the line height in all browsers */
-			/* NOTE: to Prevent adjustments of font size after orientation changes in iOS : */
+			line-height: 1.15; /* correct the line height in all browsers */
 			/* -webkit-text-size-adjust: 100%; */
+			/* 🡡 to prevent adjustments of font size after orientation changes in iOS : */
 		}
 		body {
 			padding: 0; margin: 0; /* reset */
@@ -157,7 +157,7 @@
 			height: 1.75rem;
 			padding: 0.25rem 0.75rem;
 			border-radius: 0.25rem;
-			border: none;
+			border: solid 1px var(--color-4);
 			background-color: var(--color-4);
 			color: var(--color-5);
 			cursor: pointer;
@@ -177,6 +177,10 @@
 			color: var(--color-0);
 			background-color: var(--color-5);
 		}
+		textarea:focus, input:focus {
+			outline: none;
+			border-color: var(--color-5);
+		}
 		textarea {
 			display: block;
 			width: 100%;
@@ -187,7 +191,9 @@
 			margin: 0.25rem 0;
 			padding: 1rem;
 			box-sizing: border-box;
+			outline: none;
 			border: solid 1px var(--color-6);
+			border-radius: 0.25rem;
 			background-color: var(--color-0);
 			color: var(--color-3);
 			resize: vertical;
@@ -204,7 +210,7 @@
 		legend {
 			text-align: left;
 			color: var(--color-6);
-			/* currections mainly for Edge and IE */
+			/* corrections mainly for Edge and IE */
 			box-sizing: border-box;
 			display: table;
 			max-width: 100%;
@@ -225,7 +231,6 @@
 			font-weight: var(--font-weight-terminal);
 			background-color: var(--color-trm-bg);
 		}
-		/* scrollbars */
 		#terminal, textarea#message { /* firefox */
 			scrollbar-color: var(--color-7) var(--color-trm-bg);
 			scrollbar-width: thin;
@@ -272,7 +277,7 @@
 		#terminal p.closing::after {
 			content: '';
 			width: 60%;
-			margin: 2em 20%; /* a gap between each dialogue */
+			margin: 2em 20%; /* the gap between dialogs */
 			display: block;
 			position: relative;
 			bottom: 0;
@@ -429,7 +434,7 @@
 			color: var(--color-6);
 			filter: opacity(0.25);
 		}
-		/* More Mobile Friendly / Responsive Styling */
+		/* more mobile friendly / responsive styling */
 		@media only screen and (orientation: portrait) and (max-device-width: 480px){
 			#ws-construction input[type=text] {
 				display: block;
@@ -463,7 +468,9 @@
 			}
 		}
 		</style>
-		<script language="javascript" type="text/javascript">
+		<script>
+		// jshint esversion:6
+		// jshint -W069
 		var DEFAULT_THEME = 'dark';
 		var MIN_ADJACENT_SLOTS_HUE_DIFF = 25;
 		var FORMAT_BY_MAGIC_NUMBERS = {
@@ -793,6 +800,18 @@
 			localStorage._weasel_theme = current_theme;
 			writeToScreen('Storage Cleared', 'error');
 		}
+		function insert_text_message(string){
+			var start = message.selectionStart;
+			var end = message.selectionEnd;
+			message.value =
+				message.value.substring(0, start) +
+				string + 
+				message.value.substring(end)
+			;
+			message.selectionStart = 
+			message.selectionEnd =
+			start + string.length;
+		}
 		document.addEventListener("DOMContentLoaded", function() {
 			root = document.getRootNode().documentElement;
 			terminal = document.getElementById('terminal');
@@ -897,12 +916,27 @@
 					}
 				}
 			};
+			// Key Overrides
+			window.onkeydown = function(event) {
+				switch (event.keyCode) {
+					case 9: // Tab
+						if (message === document.activeElement){
+							if ( (event.altKey || event.ctrlKey || event.shiftKey) == false ){
+								event.preventDefault();
+								insert_text_message("\t");
+							}
+						}
+						break;
+					default:
+						break;
+				}
+			}
 		});
 		</script>
 	</head>
 	<body>
 		<h1>Weasel</h1>
-		<h2>The WebSocket Client <span>v2.1</span></h2>
+		<h2>The WebSocket Client <span>v2.1.1</span></h2>
 		<!-- Server to Connect -->
 		<form id="ws-construction">
 			<fieldset>
@@ -951,3 +985,4 @@
 		</div>
 	</body>
 </html>
+

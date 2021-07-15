@@ -330,6 +330,18 @@ function clearStorage(){
 	localStorage._weasel_theme = current_theme;
 	writeToScreen('Storage Cleared', 'error');
 }
+function insert_text_message(string){
+	var start = message.selectionStart;
+	var end = message.selectionEnd;
+	message.value =
+		message.value.substring(0, start) +
+		string + 
+		message.value.substring(end)
+	;
+	message.selectionStart = 
+	message.selectionEnd =
+	start + string.length;
+}
 document.addEventListener("DOMContentLoaded", function() {
 	root = document.getRootNode().documentElement;
 	terminal = document.getElementById('terminal');
@@ -434,4 +446,19 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		}
 	};
+	// Key Overrides
+	window.onkeydown = function(event) {
+		switch (event.keyCode) {
+			case 9: // Tab
+				if (message === document.activeElement){
+					if ( (event.altKey || event.ctrlKey || event.shiftKey) == false ){
+						event.preventDefault();
+						insert_text_message("\t");
+					}
+				}
+				break;
+			default:
+				break;
+		}
+	}
 });
