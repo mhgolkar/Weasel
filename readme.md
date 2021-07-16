@@ -41,6 +41,8 @@ Also available as:
 + `Ctrl + Alt + S` Switch Autoscroll
 + `Ctrl + <numeral key>` Remembers Memory Slots by Index
     > e.g. `Ctrl+0` recalls the first memory
++ Message console input captures `tab` button press and inserts a "\t" character, when focused.
+    > We can use `Ctrl + Alt + Shift + Tab` to jump out of it.
 
 <!-- Refs -->
 [Firefox Add-on]: (https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)
