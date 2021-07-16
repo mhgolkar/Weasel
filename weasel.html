@@ -5,933 +5,939 @@
 		<meta charset="UTF-8">
 		<title>Weasel</title>
 		<style>
-		/* general color scheme */
-		:root { /* light theme */
-			--color-0: rgb(255, 255, 255);
-			--color-1: rgb(249, 249, 250);
-			--color-2: rgb(26, 0, 52);
-			--color-3: rgb(43, 0, 0);
-			--color-4: rgb(230, 230, 230);
-			--color-5: rgb(128, 0, 0);
-			--color-6: rgb(90, 90, 90);
-			--color-7: rgb(170, 170, 170);
-		}
-		:root[data-theme^='dark'] { /* dark theme */
-			--color-0: rgb(0, 0, 0);
-			--color-1: rgb(30, 30, 30);
-			--color-2: rgb(255, 252, 222);
-			--color-3: rgb(255, 206, 97);
-			--color-4: rgb(49, 49, 49);
-			--color-5: rgb(18, 226, 176);
-			--color-6: rgb(181, 181, 181);
-			--color-7: rgb(142, 117, 64);
-		}
-		/* terminal color scheme */
-		:root[data-theme^='dark'] {
-			--color-trm-bg: rgb(0, 0, 0);
-			--color-trm: rgb(255, 252, 222);
-			--color-opn: rgb(0, 255, 152);
-			--color-cls: rgb(255, 214, 0);
-			--color-err: rgb(255, 46, 46);
-			--color-out: rgb(254, 142, 57);
-			--color-in: rgb(37, 244, 227);
-		}
-		:root { /* light */
-			--color-trm-bg: rgb(255, 255, 255);
-			--color-trm: rgb(107, 0, 50);
-			--color-opn: rgb(0, 150, 150);
-			--color-cls: rgb(255, 0, 0);
-			--color-err: rgb(116, 0, 122);
-			--color-out: rgb(0, 150, 0);
-			--color-in: rgb(45, 0, 70);
-		}
-		/* syntax highlighting color scheme */
-		:root[data-theme^='dark'] {
-			--color-highlight-string: rgb(0, 255, 152);
-			--color-highlight-string-out: rgb(0, 219, 110);
-			--color-highlight-number: rgb(255, 115, 0);
-			--color-highlight-boolean: rgb(255, 214, 0);
-			--color-highlight-null: rgb(0, 150, 0);
-		}
-		:root { /* light */
-			--color-highlight-string: rgb(0, 0, 0);
-			--color-highlight-string-out: rgb(0, 29, 17);
-			--color-highlight-number: rgb(199, 36, 0);
-			--color-highlight-boolean: rgb(65, 0, 158);
-			--color-highlight-null: rgb(46, 73, 46);
-		}
-		:root {
-			--font: monospace, sans-serif;
-			font-family: var(--font);
-			background-color: var(--color-1);
-			color: var(--color-2);
-			font-size: 16px;
-			font-weight: 400;
-			--font-weight-headings: 300;
-			--font-weight-terminal: 400;
-			--font-weight-buttons: 900;
-			--font-weight-buttons-secondary: 400;
-			width: 100vw;
-			line-height: 1.15; /* correct the line height in all browsers */
-			/* -webkit-text-size-adjust: 100%; */
-			/* 🡡 to prevent adjustments of font size after orientation changes in iOS : */
-		}
-		body {
-			padding: 0; margin: 0; /* reset */
-			font-family: var(--font);
-			width: 95vw;
-			margin: 0 2.5vw;
-			overflow-x: hidden;
-			box-sizing: border-box;
-			border: none; outline: none;
-			padding: 0.25rem 1rem;
-		}
-		body > :first-child {
-			margin-top: 1rem !important;
-		}
-		h1 {
-			font-size: 1.5rem;
-			font-weight: var(--font-weight-headings);
-			margin: 0.5rem 0 0.25rem;
-		}
-		h2 {
-			font-size: 1rem;
-			margin: 0.5rem 0 1.5rem;
-			font-weight: var(--font-weight-headings);
-		}
-		h2 span {
-			font-size: 0.75em;
-			vertical-align: top;
-		}
-		a {
-			color: var(--color-2);
-			background-color: transparent;
-			text-decoration: none;
-			cursor: pointer;
-		}
-		form, fieldset, div {
-			width: 100%;
-			box-sizing: border-box;
-			border-color: var(--color-6);
-			border-width: 1px;
-			margin: 0.5rem 0;
-		}
-		input, button { /* normalize */
-			overflow: visible;
-			text-transform: none;
-			font-family: inherit;
-			font-size: 100%;
-			line-height: 1.15;
-			margin: 0;
-		}
-		input {
-			margin: 0.25rem 0;
-			box-sizing: content-box;
-		}
-		input, input::placeholder {
-			font-family: var(--font);
-		}
-		input[type='text']::placeholder {
-			color: var(--color-7);
-		}
-		input[type='text']{
-			border: solid 2px var(--color-6);
-			padding: 0.25rem 0.5rem;
-			letter-spacing: 0.125rem;
-			vertical-align: middle;
-			border-radius: 0.25rem;
-			text-align: center;
-		}
-		input[type='text'], input[type='text']::placeholder {
-			height: 2rem;
-			font-size: 1rem;
-		}
-		input[type='text'] {
-			border-color: var(--color-4);
-			background-color: var(--color-0);
-			color: var(--color-3);
-		}
-		input[type='button'], input[type='submit'] {
-			font-size: 1rem;
-			font-weight: var(--font-weight-buttons);
-			height: 1.75rem;
-			padding: 0.25rem 0.75rem;
-			border-radius: 0.25rem;
-			border: solid 1px var(--color-4);
-			background-color: var(--color-4);
-			color: var(--color-5);
-			cursor: pointer;
-			outline: none;
-		}
-		input[type='button']::-moz-focus-inner, input[type='button']:active,
-		input[type='submit']::-moz-focus-inner, input[type='submit']:active { /* reset */
-			border-style: none;
-			border: none;
-			padding: 0.25rem 0.75rem;
-			outline: none;
-		}
-		input[type='button']:hover, input[type='submit']:hover {
-			color: var(--color-3);
-		}
-		input[type='button']:active, input[type='submit']:active {
-			color: var(--color-0);
-			background-color: var(--color-5);
-		}
-		textarea:focus, input:focus {
-			outline: none;
-			border-color: var(--color-5);
-		}
-		textarea {
-			display: block;
-			width: 100%;
-			height: 16vh;
-			font-family: inherit;
-			line-height: 1.15;
-			font-size: 0.9rem;
-			margin: 0.25rem 0;
-			padding: 1rem;
-			box-sizing: border-box;
-			outline: none;
-			border: solid 1px var(--color-6);
-			border-radius: 0.25rem;
-			background-color: var(--color-0);
-			color: var(--color-3);
-			resize: vertical;
-			margin-bottom: 0.75rem;
-			overflow: auto; /* remove the default vertical scrollbar in IE 10+ */
-		}
-		fieldset {
-			display: block;
-			box-sizing: border-box;
-			margin-top: 0.75rem;
-			border-color: var(--color-6);
-			padding: 0.35em 0.75em 0.625em; /* normalize */
-		}
-		legend {
-			text-align: left;
-			color: var(--color-6);
-			/* corrections mainly for Edge and IE */
-			box-sizing: border-box;
-			display: table;
-			max-width: 100%;
-			font-size: 0.9em;
-			padding: 0 0.25em;
-			white-space: normal;
-		}
-		#ws-construction fieldset {
-			padding-left: 1rem;
-		}
-		#terminal {
-			overflow-x: hidden;
-			overflow-y: auto;
-			height: 40vh;
-			resize: vertical;
-			padding: 1em;
-			font-size: 0.9rem;
-			font-weight: var(--font-weight-terminal);
-			background-color: var(--color-trm-bg);
-		}
-		#terminal, textarea#message { /* firefox */
-			scrollbar-color: var(--color-7) var(--color-trm-bg);
-			scrollbar-width: thin;
-		}
-		/* scrollbar for chrome */
-		#terminal::-webkit-scrollbar, textarea#message::-webkit-scrollbar {
-			height: 100%;
-			width: 0.75em;
-		}
-		#terminal::-webkit-scrollbar-track-piece, textarea#message::-webkit-scrollbar-track-piece {
-			background-color: var(--color-trm-bg);
-		}
-		#terminal::-webkit-scrollbar-thumb, textarea#message::-webkit-scrollbar-thumb {
-			background-color: var(--color-7);
-		}
-		#terminal p {
-			margin: 0;
-			margin-top: 1px;
-			margin-left: 4.5em;
-			margin-right: 0.5em;
-			text-indent: -4.5em;
-			line-height: 1.5em;
-			word-wrap: break-word;
-			word-break: break-all;
-			white-space: normal;
-			color: var(--color-trm);
-		}
-		#terminal p::before {
-			margin: auto 2em;
-			font-size: 1.25em;
-		}
-		#terminal p.outgoing::before { content: '▲'; }
-		#terminal p.incoming::before { content: '▼'; }
-		#terminal p.closing::before { content: '✘'; }
-		#terminal p.opening::before { content: '✔'; }
-		#terminal p.url::before { content: '✈';	}
-		#terminal p.error::before { content: '↯'; }
-		#terminal p.opening {
-			color: var(--color-opn);
-		}
-		#terminal p.closing {
-			color: var(--color-cls);
-		}
-		#terminal p.closing::after {
-			content: '';
-			width: 60%;
-			margin: 2em 20%; /* the gap between dialogs */
-			display: block;
-			position: relative;
-			bottom: 0;
-			left: 0;
-			filter: opacity(0.5);
-			border-bottom: dotted 1px var(--color-cls);
-		}
-		#terminal p.error {
-			color: var(--color-err);
-		}
-		#terminal p.incoming {
-			color: var(--color-in);
-		}
-		#terminal p.outgoing {
-			color: var(--color-out);
-		}
-		#terminal p.binary-links {
-			margin: auto;
-			margin-left: 4.75em;
-			text-indent: 0.5em;
-			font-size: 1em;
-			color: var(--color-in);
-		}
-		#terminal p.binary-links a, #terminal p.binary-links span {
-			color: inherit;
-			border-bottom: solid 1px var(--color-in);
-			margin: auto 0.5em;
-			cursor: pointer;
-		}
-		#terminal p.binary-links a:hover, #terminal p.binary-links span:hover {
-			color: var(--color-3);
-		}
-		#terminal .json span {
-			word-wrap: break-word;
-			word-break: break-all;
-			white-space: normal;
-		}
-		#terminal .json pre {
-			margin: 0 auto;
-			width: 100%;
-			/* normalize */
-			font-family: monospace, monospace;
-			font-size: 1em;
-		}
-		#terminal .json span:not(.key) { font-style: italic; }
-		#terminal .json.incoming .string { color: var(--color-highlight-string); }
-		#terminal .json.outgoing .string { color: var(--color-highlight-string-out); }
-		#terminal .json .number { color: var(--color-highlight-number); }
-		#terminal .json .boolean { color: var(--color-highlight-boolean); }
-		#terminal .json .null { color: var(--color-highlight-null); }
-		#terminal p:last-of-type {
-			margin-bottom: 4rem;
-		}
-		#memory { /* ol */
-			display: inline-block;
-			list-style: none;
-			padding: 0;
-			margin: 0.25rem 0;
-		}
-		#memory li {
-			display: inline-block;
-			vertical-align: middle;
-			width: 1.75rem; height: 1.75rem;
-			border: solid 1px var(--color-2);
-			border-radius: 0.5rem;
-			margin: 0.25rem;
-		}
-		fieldset fieldset:last-of-type { /* binary */
-			padding: 0.75rem;
-		}
-		#file-selector {
-			display: inline-block;
-			width: auto;
-			max-width: 100%;
-			height: 2.25rem;
-			padding: 0;
-			margin: 0;
-			margin: 0;
-			outline: none;
-			border: none;
-			margin-bottom: 0.25rem;
-		}
-		#file-selector #file-input {
-			display: none;
-		}
-		#file-selector #file-selector-botton { /* label */
-			display: inline-block;
-			background-color: var(--color-4);
-			color: var(--color-5);
-			padding: 0 1rem 0 0;
-			vertical-align: middle;
-			cursor: pointer;
-			border-radius: 0.5rem;
-			overflow: hidden;
-			height: 100%;
-			line-height: 2.25rem;
-		}
-		#file-selector #file-selector-botton #file-name {
-			word-break: break-all;
-			text-align: center;
-			margin: 0 1rem;
-			color: var(--color-3);
-		}
-		#file-selector #file-selector-botton span:first-of-type {
-			display: inline-block;
-			height: 100%;
-			padding: 0 1rem;
-			border-right: solid 2px var(--color-1);
-			box-sizing: border-box;
-		}
-		#file-selector #file-selector-botton:hover span:first-of-type {
-			background-color: var(--color-5);
-			color: var(--color-0);
-		}
-		#file-selector #file-selector-botton:active #file-name {
-			color: var(--color-5);
-		}
-		#side-menu {
-			margin-top: 1rem;
-			margin-left: -0.25rem;
-			text-align: center;
-		}
-		#side-menu a {
-			display: inline-block;
-			height: 1.25rem;
-			line-height: 1.25rem;
-			vertical-align: middle;
-			font-size: 1rem;
-			margin: 0.25rem 0.25rem;
-			font-weight: var(--font-weight-buttons-secondary);
-			padding: 0.25rem 0.5rem;
-			border-radius: 0.25rem;
-			border: none;
-			background-color: var(--color-4);
-			color: var(--color-6);
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-		#side-menu a:hover {
-			color: var(--color-3);
-		}
-		#side-menu a:active{
-			background-color: var(--color-3);
-			color: var(--color-0);
-		}
-		#branding {
-			width: 100%;
-			margin: 0;
-			margin-top: 3rem;
-			margin-bottom: 1.5rem;
-		}
-		#branding a {
-			color: var(--color-6);
-			filter: opacity(0.25);
-		}
-		/* more mobile friendly / responsive styling */
-		@media only screen and (orientation: portrait) and (max-device-width: 480px){
-			#ws-construction input[type=text] {
-				display: block;
-				margin-bottom: 0.5rem;
-				width: 90%;
+			/* general color scheme */
+			:root { /* light theme */
+				--color-0: rgb(255, 255, 255);
+				--color-1: rgb(249, 249, 250);
+				--color-2: rgb(26, 0, 52);
+				--color-3: rgb(43, 0, 0);
+				--color-4: rgb(230, 230, 230);
+				--color-5: rgb(128, 0, 0);
+				--color-6: rgb(90, 90, 90);
+				--color-7: rgb(170, 170, 170);
 			}
-			input[type='file'] {
-				max-width: 70vw;
-				display: block;
+			:root[data-theme^='dark'] { /* dark theme */
+				--color-0: rgb(0, 0, 0);
+				--color-1: rgb(30, 30, 30);
+				--color-2: rgb(255, 252, 222);
+				--color-3: rgb(255, 206, 97);
+				--color-4: rgb(49, 49, 49);
+				--color-5: rgb(18, 226, 176);
+				--color-6: rgb(181, 181, 181);
+				--color-7: rgb(142, 117, 64);
 			}
-			#terminal p {
-				font-size: 0.9rem;
-				margin-left: 2.5em;
+			/* terminal color scheme */
+			:root[data-theme^='dark'] {
+				--color-trm-bg: rgb(0, 0, 0);
+				--color-trm: rgb(255, 252, 222);
+				--color-opn: rgb(0, 255, 152);
+				--color-cls: rgb(255, 214, 0);
+				--color-err: rgb(255, 46, 46);
+				--color-out: rgb(254, 142, 57);
+				--color-in: rgb(37, 244, 227);
 			}
-			#terminal p.binary-links {
-				margin-left: 3.75em;
+			:root { /* light */
+				--color-trm-bg: rgb(255, 255, 255);
+				--color-trm: rgb(107, 0, 50);
+				--color-opn: rgb(0, 150, 150);
+				--color-cls: rgb(255, 0, 0);
+				--color-err: rgb(116, 0, 122);
+				--color-out: rgb(0, 150, 0);
+				--color-in: rgb(45, 0, 70);
+			}
+			/* syntax highlighting color scheme */
+			:root[data-theme^='dark'] {
+				--color-highlight-string: rgb(0, 255, 152);
+				--color-highlight-string-out: rgb(0, 219, 110);
+				--color-highlight-number: rgb(255, 115, 0);
+				--color-highlight-boolean: rgb(255, 214, 0);
+				--color-highlight-null: rgb(0, 150, 0);
+			}
+			:root { /* light */
+				--color-highlight-string: rgb(0, 0, 0);
+				--color-highlight-string-out: rgb(0, 29, 17);
+				--color-highlight-number: rgb(199, 36, 0);
+				--color-highlight-boolean: rgb(65, 0, 158);
+				--color-highlight-null: rgb(46, 73, 46);
+			}
+			:root {
+				--font: monospace, sans-serif;
+				font-family: var(--font);
+				background-color: var(--color-1);
+				color: var(--color-2);
+				font-size: 16px;
+				font-weight: 400;
+				--font-weight-headings: 300;
+				--font-weight-terminal: 400;
+				--font-weight-buttons: 900;
+				--font-weight-buttons-secondary: 400;
+				width: 100vw;
+				line-height: 1.15; /* correct the line height in all browsers */
+				/* -webkit-text-size-adjust: 100%; */
+				/* 🡡 to prevent adjustments of font size after orientation changes in iOS : */
+			}
+			body {
+				padding: 0; margin: 0; /* reset */
+				font-family: var(--font);
+				width: 95vw;
+				margin: 0 2.5vw;
+				overflow-x: hidden;
+				box-sizing: border-box;
+				border: none; outline: none;
+				padding: 0.25rem 1rem;
+			}
+			body > :first-child {
+				margin-top: 1rem !important;
+			}
+			h1 {
+				font-size: 1.5rem;
+				font-weight: var(--font-weight-headings);
+				margin: 0.5rem 0 0.25rem;
+			}
+			h2 {
+				font-size: 1rem;
+				margin: 0.5rem 0 1.5rem;
+				font-weight: var(--font-weight-headings);
+			}
+			h2 span {
+				font-size: 0.75em;
+				vertical-align: top;
+			}
+			a {
+				color: var(--color-2);
+				background-color: transparent;
+				text-decoration: none;
+				cursor: pointer;
+			}
+			form, fieldset, div {
+				width: 100%;
+				box-sizing: border-box;
+				border-color: var(--color-6);
+				border-width: 1px;
+				margin: 0.5rem 0;
+			}
+			input, button { /* normalize */
+				overflow: visible;
+				text-transform: none;
+				font-family: inherit;
+				font-size: 100%;
+				line-height: 1.15;
+				margin: 0;
+			}
+			input {
+				margin: 0.25rem 0;
+				box-sizing: content-box;
+			}
+			input, input::placeholder {
+				font-family: var(--font);
+			}
+			input[type='text']::placeholder {
+				color: var(--color-7);
+			}
+			input[type='text']{
+				border: solid 2px var(--color-6);
+				padding: 0.25rem 0.5rem;
+				letter-spacing: 0.125rem;
+				vertical-align: middle;
+				border-radius: 0.25rem;
+				text-align: center;
+			}
+			input[type='text'], input[type='text']::placeholder {
+				height: 2rem;
+				font-size: 1rem;
+			}
+			input[type='text'] {
+				border-color: var(--color-4);
+				background-color: var(--color-0);
+				color: var(--color-3);
+			}
+			input[type='button'], input[type='submit'] {
+				font-size: 1rem;
+				font-weight: var(--font-weight-buttons);
+				height: 1.75rem;
+				padding: 0.25rem 0.75rem;
+				border-radius: 0.25rem;
+				border: solid 1px var(--color-4);
+				background-color: var(--color-4);
+				color: var(--color-5);
+				cursor: pointer;
+				outline: none;
+			}
+			input[type='button']::-moz-focus-inner, input[type='button']:active,
+			input[type='submit']::-moz-focus-inner, input[type='submit']:active { /* reset */
+				border-style: none;
+				border: none;
+				padding: 0.25rem 0.75rem;
+				outline: none;
+			}
+			input[type='button']:hover, input[type='submit']:hover {
+				color: var(--color-3);
+			}
+			input[type='button']:active, input[type='submit']:active {
+				color: var(--color-0);
+				background-color: var(--color-5);
+			}
+			textarea:focus, input:focus {
+				outline: none;
+				border-color: var(--color-5);
 			}
 			textarea {
+				display: block;
+				width: 100%;
+				height: 16vh;
+				font-family: inherit;
+				line-height: 1.15;
 				font-size: 0.9rem;
+				margin: 0.25rem 0;
+				padding: 1rem;
+				box-sizing: border-box;
+				outline: none;
+				border: solid 1px var(--color-6);
+				border-radius: 0.25rem;
+				background-color: var(--color-0);
+				color: var(--color-3);
+				resize: vertical;
+				margin-bottom: 0.75rem;
+				overflow: auto; /* remove the default vertical scrollbar in IE 10+ */
 			}
-			#side-menu a:before {
-				filter: opacity(0.3);
+			fieldset {
+				display: block;
+				box-sizing: border-box;
+				margin-top: 0.75rem;
+				border-color: var(--color-6);
+				padding: 0.35em 0.75em 0.625em; /* normalize */
+			}
+			legend {
+				text-align: left;
+				color: var(--color-6);
+				/* corrections mainly for Edge and IE */
+				box-sizing: border-box;
+				display: table;
+				max-width: 100%;
+				font-size: 0.9em;
+				padding: 0 0.25em;
+				white-space: normal;
+			}
+			#ws-construction fieldset {
+				padding-left: 1rem;
+			}
+			#terminal {
+				overflow-x: hidden;
+				overflow-y: auto;
+				height: 40vh;
+				resize: vertical;
+				padding: 1em;
+				font-size: 0.9rem;
+				font-weight: var(--font-weight-terminal);
+				background-color: var(--color-trm-bg);
+			}
+			#terminal, textarea#message { /* firefox */
+				scrollbar-color: var(--color-7) var(--color-trm-bg);
+				scrollbar-width: thin;
+			}
+			/* scrollbar for chrome */
+			#terminal::-webkit-scrollbar, textarea#message::-webkit-scrollbar {
+				height: 100%;
+				width: 0.75em;
+			}
+			#terminal::-webkit-scrollbar-track-piece, textarea#message::-webkit-scrollbar-track-piece {
+				background-color: var(--color-trm-bg);
+			}
+			#terminal::-webkit-scrollbar-thumb, textarea#message::-webkit-scrollbar-thumb {
+				background-color: var(--color-7);
+			}
+			#terminal p {
+				margin: 0;
+				margin-top: 1px;
+				margin-left: 4.5em;
+				margin-right: 0.5em;
+				text-indent: -4.5em;
+				line-height: 1.5em;
+				word-wrap: break-word;
+				word-break: break-all;
+				white-space: normal;
+				color: var(--color-trm);
+			}
+			#terminal p::before {
+				margin: auto 2em;
+				font-size: 1.25em;
+			}
+			#terminal p.outgoing::before { content: '▲'; }
+			#terminal p.incoming::before { content: '▼'; }
+			#terminal p.closing::before { content: '✘'; }
+			#terminal p.opening::before { content: '✔'; }
+			#terminal p.url::before { content: '✈';	}
+			#terminal p.error::before { content: '↯'; }
+			#terminal p.opening {
+				color: var(--color-opn);
+			}
+			#terminal p.closing {
+				color: var(--color-cls);
+			}
+			#terminal p.closing::after {
+				content: '';
+				width: 60%;
+				margin: 2em 20%; /* the gap between dialogs */
+				display: block;
+				position: relative;
+				bottom: 0;
+				left: 0;
+				filter: opacity(0.5);
+				border-bottom: dotted 1px var(--color-cls);
+			}
+			#terminal p.error {
+				color: var(--color-err);
+			}
+			#terminal p.incoming {
+				color: var(--color-in);
+			}
+			#terminal p.outgoing {
+				color: var(--color-out);
+			}
+			#terminal p.binary-links {
+				margin: auto;
+				margin-left: 4.75em;
+				text-indent: 0.5em;
+				font-size: 1em;
+				color: var(--color-in);
+			}
+			#terminal p.binary-links a, #terminal p.binary-links span {
+				color: inherit;
+				border-bottom: solid 1px var(--color-in);
+				margin: auto 0.5em;
+				cursor: pointer;
+			}
+			#terminal p.binary-links a:hover, #terminal p.binary-links span:hover {
+				color: var(--color-3);
+			}
+			#terminal .json span {
+				word-wrap: break-word;
+				word-break: break-all;
+				white-space: normal;
+			}
+			#terminal .json pre {
+				margin: 0 auto;
+				width: 100%;
+				/* normalize */
+				font-family: monospace, monospace;
+				font-size: 1em;
+			}
+			#terminal .json span:not(.key) { font-style: italic; }
+			#terminal .json.incoming .string { color: var(--color-highlight-string); }
+			#terminal .json.outgoing .string { color: var(--color-highlight-string-out); }
+			#terminal .json .number { color: var(--color-highlight-number); }
+			#terminal .json .boolean { color: var(--color-highlight-boolean); }
+			#terminal .json .null { color: var(--color-highlight-null); }
+			#terminal p:last-of-type {
+				margin-bottom: 4rem;
+			}
+			#memory { /* ol */
+				display: inline-block;
+				list-style: none;
+				padding: 0;
+				margin: 0.25rem 0;
+			}
+			#memory li {
+				display: inline-block;
+				vertical-align: middle;
+				width: 1.75rem; height: 1.75rem;
+				border: solid 1px var(--color-2);
+				border-radius: 0.5rem;
+				margin: 0.25rem;
+			}
+			fieldset fieldset:last-of-type { /* binary */
+				padding: 0.75rem;
+			}
+			#file-selector {
+				display: inline-block;
+				width: auto;
+				max-width: 100%;
+				height: 2.25rem;
+				padding: 0;
+				margin: 0;
+				margin: 0;
+				outline: none;
+				border: none;
+				margin-bottom: 0.25rem;
+			}
+			#file-selector #file-input {
+				display: none;
+			}
+			#file-selector #file-selector-botton { /* label */
+				display: inline-block;
+				background-color: var(--color-4);
+				color: var(--color-5);
+				padding: 0 1rem 0 0;
+				vertical-align: middle;
+				cursor: pointer;
+				border-radius: 0.5rem;
+				overflow: hidden;
+				height: 100%;
+				line-height: 2.25rem;
+			}
+			#file-selector #file-selector-botton #file-name {
+				word-break: break-all;
+				text-align: center;
+				margin: 0 1rem;
+				color: var(--color-3);
+			}
+			#file-selector #file-selector-botton span:first-of-type {
+				display: inline-block;
+				height: 100%;
+				padding: 0 1rem;
+				border-right: solid 2px var(--color-1);
+				box-sizing: border-box;
+			}
+			#file-selector #file-selector-botton:hover span:first-of-type {
+				background-color: var(--color-5);
+				color: var(--color-0);
+			}
+			#file-selector #file-selector-botton:active #file-name {
+				color: var(--color-5);
+			}
+			#side-menu {
+				margin-top: 1rem;
+				margin-left: -0.25rem;
+				text-align: center;
 			}
 			#side-menu a {
 				display: inline-block;
+				height: 1.25rem;
+				line-height: 1.25rem;
+				vertical-align: middle;
+				font-size: 1rem;
+				margin: 0.25rem 0.25rem;
+				font-weight: var(--font-weight-buttons-secondary);
+				padding: 0.25rem 0.5rem;
+				border-radius: 0.25rem;
 				border: none;
-				width: 70vw;
+				background-color: var(--color-4);
+				color: var(--color-6);
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			#side-menu a:hover {
+				color: var(--color-3);
+			}
+			#side-menu a:active{
+				background-color: var(--color-3);
+				color: var(--color-0);
 			}
 			#branding {
-				text-align: center;
+				width: 100%;
+				margin: 0;
+				margin-top: 3rem;
+				margin-bottom: 1.5rem;
 			}
-		}
-		</style>
-		<script>
-		// jshint esversion:6
-		// jshint -W069
-		var DEFAULT_THEME = 'dark';
-		var MIN_ADJACENT_SLOTS_HUE_DIFF = 25;
-		var FORMAT_BY_MAGIC_NUMBERS = {
-			'89504E47':'png', '47494638':'gif', '25504446':'pdf', 'FFD8FFDB': 'jpg', 'FFD8FFEE':'jpg', '4F676753':'ogg', '38425053':'psd',
-			'FFD8FFE0':'jpg', 'FFD8FFE1':'jpg', '49492A00':'tif', '4D4D002A':'tif', '53445058':'dpx', '58504453':'dpx', '7B5C7274':'rtf',
-			'504B0304':'zip', '52617221':'rar', 'EDABEEDB':'rpm', '54444624':'tdf', '54444546':'tdef', '762F3101':'exr', '425047FB':'bpg',
-			'57415645':'wav', '41564920':'avi', '664C6143':'flac', '4D546864':'midi', '75737461':'tar', '377ABCAF':'7z', 'FD377A58':'xz',
-			'464C4946':'flif', '1A45DFA3':'mkv', '41542654':'djv', '774F4646':'woff', '774F4632':'woff2', '3C3F786D':'xml', '0061736D':'asm',
-			'213C6172':'deb', '000001BA':'mpg', '000001B3':'mpg', '1B4C7561':'luac'
-		};
-		var WS;
-		var root, terminal, url, protocol, message, memory;
-		var _ArrayBuffers = [], _Blobs = [], _JSONs = [], _Memory = {}, _Memory_order = [];
-		var last_used_memory_slot_color, last_remembered_slot;
-		var TIME_MACHINE_CAPACITY = 75, time_machine = [], time_machine_index = 0;
-		var auto_scroll = true, auto_scroll_marker;
-		var file_selector_display;
-		function createSocket() {
-			if (WS && 'readyState' in WS && WS.readyState === 1 ){
-				WS.onclose = function(ev) { onClose(ev); createSocket(); };
-				writeToScreen('Overriding Existing Connection...', 'error');
-				WS.close();
-			} else {
-				var supports = 'WebSocket' in window || 'MozWebSocket' in window;
-				var protocols;
-				if ( supports ){
-					if ( url.value.length > 0 ) {
-						try {
-							if( protocol.value.length > 0 ) {
-								protocols = protocol.value.trim().replace(/\s/g, '');
-								protocols =	( protocols.indexOf(',') > 0 ? protocols.split(',') : protocols);
-								WS = window['MozWebSocket'] ? new MozWebSocket(url.value, protocols) : new WebSocket(url.value, protocols);
-							} else {
-								WS = window['MozWebSocket'] ? new MozWebSocket(url.value) : new WebSocket(url.value);
-							}
-							WS.onopen = function(ev) { onOpen(ev); };
-							WS.onclose = function(ev) { onClose(ev); };
-							WS.onmessage = function(ev) { onMessage(ev); };
-							WS.onerror = function(ev) { onError(ev); };
-							protocols = protocols ? ( typeof protocols === 'string' ? protocols : protocols.join(' , ') ) : '';
-								if ( protocols.length > 0 ) protocols = `[ ${protocols} ]`;
-							writeToScreen(`CONNECTING:   ${ url.value.toUpperCase() } ${protocols}`, 'url');
-						} catch(err){
-							writeToScreen('Unable to Create Socket! ' + err.message, 'error');
-						}
-					} else {
-						writeToScreen('We Need a URL to Connect!', 'error');
-					}
-					// also save the last configs to the storage
-					localStorage._weasel_last_used_protocol = protocol.value;
-					localStorage._weasel_last_used_url = url.value;
-				} else {
-					writeToScreen("This Browser Doesn't Support WebSocket!", 'error');
+			#branding a {
+				color: var(--color-6);
+				filter: opacity(0.25);
+			}
+			/* more mobile friendly / responsive styling */
+			@media only screen and (orientation: portrait) and (max-device-width: 480px){
+				#ws-construction input[type=text] {
+					display: block;
+					margin-bottom: 0.5rem;
+					width: 90%;
+				}
+				input[type='file'] {
+					max-width: 70vw;
+					display: block;
+				}
+				#terminal p {
+					font-size: 0.9rem;
+					margin-left: 2.5em;
+				}
+				#terminal p.binary-links {
+					margin-left: 3.75em;
+				}
+				textarea {
+					font-size: 0.9rem;
+				}
+				#side-menu a:before {
+					filter: opacity(0.3);
+				}
+				#side-menu a {
+					display: inline-block;
+					border: none;
+					width: 70vw;
+				}
+				#branding {
+					text-align: center;
 				}
 			}
-		}
-		function onOpen(ev){
-			writeToScreen('CONNECTION READY', 'opening');
-		}
-		function onClose(ev){
-			writeToScreen('CONNECTION CLOSED!', 'closing');
-		}
-		function onMessage(ev){
-			var msg, bin_group, bin_position;
-			if ( ev.data instanceof ArrayBuffer ){
-				bin_group = '_ArrayBuffers';
-				bin_position = _ArrayBuffers.length;
-				_ArrayBuffers.push(ev.data);
-				msg = `${ev.data.byteLength} byte ArrayBuffer!`;
-			} else if ( ev.data instanceof Blob ){
-				bin_group = '_Blobs';
-				bin_position = _Blobs.length;
-				_Blobs.push(ev.data);
-				msg = `${ev.data.size} byte Blob!`;
-			} else {
-				msg = (typeof ev.data === 'object') ? JSON.stringify(ev.data) : ev.data;
+		</style>
+		<script>
+			// jshint esversion:6
+			// jshint -W069
+			var DEFAULT_THEME = 'dark';
+			var MIN_ADJACENT_SLOTS_HUE_DIFF = 25;
+			var FORMAT_BY_MAGIC_NUMBERS = {
+				'89504E47':'png', '47494638':'gif', '25504446':'pdf', 'FFD8FFDB': 'jpg', 'FFD8FFEE':'jpg', '4F676753':'ogg', '38425053':'psd',
+				'FFD8FFE0':'jpg', 'FFD8FFE1':'jpg', '49492A00':'tif', '4D4D002A':'tif', '53445058':'dpx', '58504453':'dpx', '7B5C7274':'rtf',
+				'504B0304':'zip', '52617221':'rar', 'EDABEEDB':'rpm', '54444624':'tdf', '54444546':'tdef', '762F3101':'exr', '425047FB':'bpg',
+				'57415645':'wav', '41564920':'avi', '664C6143':'flac', '4D546864':'midi', '75737461':'tar', '377ABCAF':'7z', 'FD377A58':'xz',
+				'464C4946':'flif', '1A45DFA3':'mkv', '41542654':'djv', '774F4646':'woff', '774F4632':'woff2', '3C3F786D':'xml', '0061736D':'asm',
+				'213C6172':'deb', '000001BA':'mpg', '000001B3':'mpg', '1B4C7561':'luac'
+			};
+			var WS;
+			var root, terminal, url, protocol, message, memory;
+			var _ArrayBuffers = [], _Blobs = [], _JSONs = [], _Memory = {}, _Memory_order = [];
+			var last_used_memory_slot_color, last_remembered_slot;
+			var TIME_MACHINE_CAPACITY = 75, time_machine = [], time_machine_index = 0;
+			var auto_scroll = true, auto_scroll_marker;
+			var file_selector_display;
+			function createSocket() {
+				if (WS && 'readyState' in WS && WS.readyState === 1 ){
+					WS.onclose = function(ev) { onClose(ev); createSocket(); };
+					writeToScreen('Overriding Existing Connection...', 'error');
+					WS.close();
+				} else {
+					var supports = 'WebSocket' in window || 'MozWebSocket' in window;
+					var protocols;
+					if ( supports ){
+						if ( url.value.length > 0 ) {
+							try {
+								if( protocol.value.length > 0 ) {
+									protocols = protocol.value.trim().replace(/\s/g, '');
+									protocols =	( protocols.indexOf(',') > 0 ? protocols.split(',') : protocols);
+									WS = window['MozWebSocket'] ? new MozWebSocket(url.value, protocols) : new WebSocket(url.value, protocols);
+								} else {
+									WS = window['MozWebSocket'] ? new MozWebSocket(url.value) : new WebSocket(url.value);
+								}
+								WS.onopen = function(ev) { onOpen(ev); };
+								WS.onclose = function(ev) { onClose(ev); };
+								WS.onmessage = function(ev) { onMessage(ev); };
+								WS.onerror = function(ev) { onError(ev); };
+								protocols = protocols ? ( typeof protocols === 'string' ? protocols : protocols.join(' , ') ) : '';
+									if ( protocols.length > 0 ) protocols = `[ ${protocols} ]`;
+								writeToScreen(`CONNECTING:   ${ url.value.toUpperCase() } ${protocols}`, 'url');
+							} catch(err){
+								writeToScreen('Unable to Create Socket! ' + err.message, 'error');
+							}
+						} else {
+							writeToScreen('We Need a URL to Connect!', 'error');
+						}
+						// also save the last configs to the storage
+						localStorage._weasel_last_used_protocol = protocol.value;
+						localStorage._weasel_last_used_url = url.value;
+					} else {
+						writeToScreen("This Browser Doesn't Support WebSocket!", 'error');
+					}
+				}
 			}
-			writeToScreen( msg, 'incoming');
-			if (bin_position !== undefined) makeBinaryLink(bin_group, bin_position);
-		}
-		function onError(ev){
-			console.log(ev);
-			var error_ = (ev && ev.data) ? ev.data : "The Connection is Abruptly Closed or Couldn't be Opened !";
-			writeToScreen(error_, 'error');
-		}
-		function doSend(){
-			if ( message.value.length > 0 ){
-				if (WS && WS.readyState === 1 ) {
-					writeToScreen(message.value, 'outgoing');
-					WS.send(message.value);
-					keepHistory(message.value);
+			function onOpen(ev){
+				writeToScreen('CONNECTION READY', 'opening');
+			}
+			function onClose(ev){
+				writeToScreen('CONNECTION CLOSED!', 'closing');
+			}
+			function onMessage(ev){
+				var msg, bin_group, bin_position;
+				if ( ev.data instanceof ArrayBuffer ){
+					bin_group = '_ArrayBuffers';
+					bin_position = _ArrayBuffers.length;
+					_ArrayBuffers.push(ev.data);
+					msg = `${ev.data.byteLength} byte ArrayBuffer!`;
+				} else if ( ev.data instanceof Blob ){
+					bin_group = '_Blobs';
+					bin_position = _Blobs.length;
+					_Blobs.push(ev.data);
+					msg = `${ev.data.size} byte Blob!`;
+				} else {
+					msg = (typeof ev.data === 'object') ? JSON.stringify(ev.data) : ev.data;
+				}
+				writeToScreen( msg, 'incoming');
+				if (bin_position !== undefined) makeBinaryLink(bin_group, bin_position);
+			}
+			function onError(ev){
+				console.log(ev);
+				var error_ = (ev && ev.data) ? ev.data : "The Connection is Abruptly Closed or Couldn't be Opened !";
+				writeToScreen(error_, 'error');
+			}
+			function doSend(){
+				if ( message.value.length > 0 ){
+					if (WS && WS.readyState === 1 ) {
+						writeToScreen(message.value, 'outgoing');
+						WS.send(message.value);
+						keepHistory(message.value);
+					} else {
+						writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
+					}
+				}
+			}
+			function doSendBinary(send_as_blob){
+				var file = document.querySelector('input[type="file"]').files[0];
+				if (WS && WS.readyState === 1 ){
+					if ( typeof file === 'object' ){
+						if( send_as_blob ){
+							WS.binaryType = 'blob';
+							WS.send(file);
+							writeToScreen(`♣ Blob Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
+						} else {
+							var fileReader = new FileReader();
+							fileReader.onerror = writeToScreen.bind(null, 'Unable to Read File As Array Buffer', 'error');
+							fileReader.readAsArrayBuffer(file);
+							fileReader.onload = function (ev) {
+								if (ev.target.readyState === FileReader.DONE){
+									WS.binaryType = 'arraybuffer';
+									WS.send(fileReader.result);
+									writeToScreen(`♠ Array Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
+								}
+							};
+						}
+					} else {
+						writeToScreen('No File Selected!', 'error');
+					}
 				} else {
 					writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
 				}
 			}
-		}
-		function doSendBinary(send_as_blob){
-			var file = document.querySelector('input[type="file"]').files[0];
-			if (WS && WS.readyState === 1 ){
-				if ( typeof file === 'object' ){
-					if( send_as_blob ){
-						WS.binaryType = 'blob';
-						WS.send(file);
-						writeToScreen(`♣ Blob Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
-					} else {
-						var fileReader = new FileReader();
-						fileReader.onerror = writeToScreen.bind(null, 'Unable to Read File As Array Buffer', 'error');
-						fileReader.readAsArrayBuffer(file);
-						fileReader.onload = function (ev) {
-							if (ev.target.readyState === FileReader.DONE){
-								WS.binaryType = 'arraybuffer';
-								WS.send(fileReader.result);
-								writeToScreen(`♠ Array Buffer Sent: ${file.name} [${file.size} B]`, 'outgoing');
+			var DOM_Parser = new DOMParser();
+			function writeToScreen(message, class_name){
+				var is_json, pretty_print;
+				if ( typeof message === 'string' && '{['.indexOf(message.trim()[0]) !== -1 ){
+					try {
+						var object = JSON.parse(message);
+						pretty_print = JSON.stringify(object, undefined, 3);
+						if (class_name === 'incoming') _JSONs.push(object);
+						is_json = true;
+					} catch(err){
+						is_json = false;
+					}
+				}
+				var p = document.createElement('p');
+				if ( is_json === true ) {
+					p.className = `${class_name} json`;
+					var parsed_syntax_highlighted = DOM_Parser.parseFromString(`<pre>\t${ syntaxHighlight(pretty_print) }\t</pre>`, "text/html");
+					var pre_contents = parsed_syntax_highlighted.getElementsByTagName('pre');
+					for (var tag of pre_contents) {
+						p.appendChild(tag);
+					}
+				} else {
+					p.className = class_name;
+					p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
+				}
+				terminal.appendChild(p);
+				if(auto_scroll) terminal.scrollTop = terminal.scrollHeight;
+			}
+			function switchAutoScroll(){
+				auto_scroll = !auto_scroll;
+				auto_scroll_marker.innerText = auto_scroll ? '⚫' : '⚪';
+			}
+			function syntaxHighlight(json) {
+				var syntax_highlighted_json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+				return syntax_highlighted_json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+					var type = 'number';
+					if (/^"/.test(match)) {
+						if (/:$/.test(match)) {
+							type = 'key';
+						} else {
+							type = 'string';
+						}
+					} else if (/true|false/.test(match)) {
+						type = 'boolean';
+					} else if (/null/.test(match)) {
+						type = 'null';
+					}
+					return `<span class="${type}">${match}</span>`;
+				});
+			}
+			function magicallyFindType(magic_slice, bin){
+				var uint = new Uint8Array(magic_slice);
+				var bytes = [];
+				uint.forEach( function(byte){
+					bytes.push( byte.toString(16) );
+				});
+				var hex = bytes.join('').toUpperCase();
+				bin.magic_number = hex;
+				return ( FORMAT_BY_MAGIC_NUMBERS.hasOwnProperty(hex) ) ? FORMAT_BY_MAGIC_NUMBERS[hex] : 'bin';
+			}
+			function makeBinaryLink(bin_group, bin_position){
+				var blob;
+				var bin = window[bin_group][bin_position];
+				if ( bin instanceof Blob ){
+					blob = bin;
+				} else if ( bin instanceof ArrayBuffer ) {
+					blob = new Blob( [bin] );
+				}
+				var link = window.URL.createObjectURL(blob);
+				var extension;
+				if ( typeof blob.type === 'string' && blob.type.length > 0 ){
+					extension = blob.type;
+				} else {
+					if ( bin instanceof Blob ){
+						var filereader = new FileReader();
+						filereader.onloadend = function(ev) {
+							if (ev.target.readyState === FileReader.DONE) {
+								extension = magicallyFindType(ev.target.result, bin);
+								writeBinaryLinks(link, bin_group, bin_position, extension);
 							}
 						};
-					}
-				} else {
-					writeToScreen('No File Selected!', 'error');
-				}
-			} else {
-				writeToScreen('SOCKET IS NOT OPEN/READY', 'error');
-			}
-		}
-		var DOM_Parser = new DOMParser();
-		function writeToScreen(message, class_name){
-			var is_json, pretty_print;
-			if ( typeof message === 'string' && '{['.indexOf(message.trim()[0]) !== -1 ){
-				try {
-					var object = JSON.parse(message);
-					pretty_print = JSON.stringify(object, undefined, 3);
-					if (class_name === 'incoming') _JSONs.push(object);
-					is_json = true;
-				} catch(err){
-					is_json = false;
-				}
-			}
-			var p = document.createElement('p');
-			if ( is_json === true ) {
-				p.className = `${class_name} json`;
-				var parsed_syntax_highlighted = DOM_Parser.parseFromString(`<pre>\t${ syntaxHighlight(pretty_print) }\t</pre>`, "text/html");
-				var pre_contents = parsed_syntax_highlighted.getElementsByTagName('pre');
-				for (var tag of pre_contents) {
-					p.appendChild(tag);
-				}
-			} else {
-				p.className = class_name;
-				p.innerText = (typeof message === 'object') ? JSON.stringify(message) : message;
-			}
-			terminal.appendChild(p);
-			if(auto_scroll) terminal.scrollTop = terminal.scrollHeight;
-		}
-		function switchAutoScroll(){
-			auto_scroll = !auto_scroll;
-			auto_scroll_marker.innerText = auto_scroll ? '⚫' : '⚪';
-		}
-		function syntaxHighlight(json) {
-			var syntax_highlighted_json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-			return syntax_highlighted_json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-				var type = 'number';
-				if (/^"/.test(match)) {
-					if (/:$/.test(match)) {
-						type = 'key';
+						var magic_part = bin.slice(0, 4);
+						filereader.readAsArrayBuffer(magic_part);
+					} else if ( bin instanceof ArrayBuffer ){
+						var magic_slice = bin.slice(0, 4);
+						extension = magicallyFindType(magic_slice, bin);
+						writeBinaryLinks(link, bin_group, bin_position, extension);
 					} else {
-						type = 'string';
+						writeBinaryLinks(link, bin_group, bin_position, extension);
 					}
-				} else if (/true|false/.test(match)) {
-					type = 'boolean';
-				} else if (/null/.test(match)) {
-					type = 'null';
 				}
-				return `<span class="${type}">${match}</span>`;
-			});
-		}
-		function magicallyFindType(magic_slice, bin){
-			var uint = new Uint8Array(magic_slice);
-			var bytes = [];
-			uint.forEach( function(byte){
-				bytes.push( byte.toString(16) );
-			});
-			var hex = bytes.join('').toUpperCase();
-			bin.magic_number = hex;
-			return ( FORMAT_BY_MAGIC_NUMBERS.hasOwnProperty(hex) ) ? FORMAT_BY_MAGIC_NUMBERS[hex] : 'bin';
-		}
-		function makeBinaryLink(bin_group, bin_position){
-			var blob;
-			var bin = window[bin_group][bin_position];
-			if ( bin instanceof Blob ){
-				blob = bin;
-			} else if ( bin instanceof ArrayBuffer ) {
-				blob = new Blob( [bin] );
 			}
-			var link = window.URL.createObjectURL(blob);
-			var extension;
-			if ( typeof blob.type === 'string' && blob.type.length > 0 ){
-				extension = blob.type;
-			} else {
-				if ( bin instanceof Blob ){
-					var filereader = new FileReader();
-					filereader.onloadend = function(ev) {
-						if (ev.target.readyState === FileReader.DONE) {
-							extension = magicallyFindType(ev.target.result, bin);
-							writeBinaryLinks(link, bin_group, bin_position, extension);
-						}
-					};
-					var magic_part = bin.slice(0, 4);
-					filereader.readAsArrayBuffer(magic_part);
-				} else if ( bin instanceof ArrayBuffer ){
-					var magic_slice = bin.slice(0, 4);
-					extension = magicallyFindType(magic_slice, bin);
-					writeBinaryLinks(link, bin_group, bin_position, extension);
+			function writeBinaryLinks(link, bin_group, bin_position, extension){
+				var bin_title = `${bin_group}[${bin_position}]`;
+				var links = document.createElement('p');
+				links.innerText = `${bin_title} :: ${extension.toUpperCase()} `;
+				var download = document.createElement('a');
+					download.setAttribute('download', `${bin_title}.${extension}`);
+					download.href = link;
+					download.innerText = 'SAVE ⮟';
+					links.appendChild(download);
+				var open = document.createElement('a');
+					open.target = '_blank';
+					open.href = link;
+					open.innerText = 'OPEN ⯁';
+					links.appendChild(open);
+				var print = document.createElement('span');
+					print.innerText = 'LOG ☷';
+					print.addEventListener('click', function(){
+						console.log(bin_title, window[bin_group][bin_position]);
+					});
+					links.appendChild(print);
+				links.className = 'binary-links';
+				terminal.appendChild(links);
+			}
+			function colorIsNotClear(usedColor){
+				return (
+					_Memory.hasOwnProperty(usedColor) ||
+					( last_used_memory_slot_color != undefined &&
+						Math.abs(last_used_memory_slot_color - usedColor) < MIN_ADJACENT_SLOTS_HUE_DIFF
+					)
+				);
+			}
+			function appendMemorySlot(slotColor){
+				var memory_slot = document.createElement('li');
+				memory_slot.style.backgroundColor = `hsl(${slotColor},50%,50%)`;
+				memory_slot.id = `m-${slotColor}`;
+				memory_slot.addEventListener('click', remember.bind(null, slotColor));
+				memory_slot.addEventListener('dblclick', remember.bind(null, slotColor, undefined, true));
+				memory_slot.addEventListener('contextmenu', forget.bind(null, slotColor));
+				memory.appendChild(memory_slot);
+			}
+			function memorize(){
+				if ( message.value.length > 0 ){
+					var randomHueID;
+					do { // make a unique color/id for the _Memory
+						randomHueID = Math.floor(Math.random() * 360) + 1;
+					} while ( colorIsNotClear(randomHueID) );
+					last_used_memory_slot_color = randomHueID;
+					_Memory[randomHueID] = message.value;
+					last_remembered_slot = _Memory_order.length;
+					_Memory_order.push(randomHueID);
+					appendMemorySlot(randomHueID);
+				}
+			}
+			function remember(memorySlotID, remembered_index, also_send){
+				if ( _Memory.hasOwnProperty(memorySlotID) ){
+					message.value = _Memory[memorySlotID];
+					if( remembered_index == undefined || remembered_index >= _Memory_order.length ) last_remembered_slot = _Memory_order.indexOf(memorySlotID);
+					if (also_send === true) doSend();
+				}
+			}
+			function rememberRoll(){
+				var slots_count = _Memory_order.length;
+				if ( slots_count > 0 ){
+					if (typeof last_remembered_slot !== 'number' || last_remembered_slot >= (slots_count - 1)){
+						last_remembered_slot = 0;
+					} else {
+						last_remembered_slot++;
+					}
+					remember(_Memory_order[last_remembered_slot], last_remembered_slot);
 				} else {
-					writeBinaryLinks(link, bin_group, bin_position, extension);
+					writeToScreen('No Memory Slot to Rotate!', 'error');
 				}
 			}
-		}
-		function writeBinaryLinks(link, bin_group, bin_position, extension){
-			var bin_title = `${bin_group}[${bin_position}]`;
-			var links = document.createElement('p');
-			links.innerText = `${bin_title} :: ${extension.toUpperCase()} `;
-			var download = document.createElement('a');
-				download.setAttribute('download', `${bin_title}.${extension}`);
-				download.href = link;
-				download.innerText = 'SAVE ⮟';
-				links.appendChild(download);
-			var open = document.createElement('a');
-				open.target = '_blank';
-				open.href = link;
-				open.innerText = 'OPEN ⯁';
-				links.appendChild(open);
-			var print = document.createElement('span');
-				print.innerText = 'LOG ☷';
-				print.addEventListener('click', function(){
-					console.log(bin_title, window[bin_group][bin_position]);
+			function keepHistory(sent_message){
+				time_machine_index = 0;
+				time_machine.unshift(sent_message);
+				if (time_machine.length > TIME_MACHINE_CAPACITY) time_machine.pop();
+			}
+			function timeMachine( direction ){
+				if ( time_machine.length > 0 ){
+					// time_machine_index[0] is the last recent record
+					if (direction === true && time_machine_index < (time_machine.length - 1)){ // backward
+						time_machine_index++;
+					}
+					if (direction === false && time_machine_index > 0) { // forward
+						time_machine_index--;
+					}
+					message.value = time_machine[time_machine_index];
+				}
+			}
+			function forget(memorySlotID, event){
+				if (event) event.preventDefault();
+				if ( _Memory.hasOwnProperty(memorySlotID) ){
+					delete _Memory[memorySlotID];
+					var slot_index = _Memory_order.indexOf(memorySlotID);
+					if (last_remembered_slot == slot_index) last_remembered_slot = undefined;
+					_Memory_order.splice(slot_index, 1);
+					document.getElementById(`m-${memorySlotID}`).remove();
+				}
+			}
+			function storeMemorySlots(){
+				var memory_slots_to_store = {
+					order: _Memory_order,
+					slots: _Memory
+				};
+				localStorage._weasel_stored_memory_slots = JSON.stringify(memory_slots_to_store);
+				writeToScreen('Memory Slots Stored', 'opening');
+			}
+			function clearStorage(){
+				var current_theme = localStorage._weasel_theme;
+				localStorage.clear(); // but keep the theme ...
+				localStorage._weasel_theme = current_theme;
+				writeToScreen('Storage Cleared', 'error');
+			}
+			function insert_text_message(string){
+				if ('execCommand' in document) {
+					document.execCommand('insertText', false, string);
+				} else {
+					var start = message.selectionStart;
+					var end = message.selectionEnd;
+					message.value =
+						message.value.substring(0, start) +
+						string + 
+						message.value.substring(end)
+					;
+					message.selectionStart = 
+					message.selectionEnd =
+					start + string.length;
+				}
+			}
+			document.addEventListener("DOMContentLoaded", function() {
+				root = document.getRootNode().documentElement;
+				terminal = document.getElementById('terminal');
+				message = document.getElementById('message');
+				url = document.getElementById('url');
+				protocol = document.getElementById('protocol');
+				memory = document.getElementById('memory');
+				auto_scroll_marker = document.querySelector('#switch-auto-scroll span');
+				file_selector_display = document.querySelector('#file-selector span#file-name');
+				message.value = ''; // clear text area
+				document.getElementById('dark-switcher').addEventListener('click', function(ev){
+					ev.preventDefault();
+					var is_dark = ( root.getAttribute('data-theme').indexOf('dark') === 0 ) ? true : false;
+					var theme_ = ( is_dark ? 'normal' : 'dark' );
+					root.setAttribute('data-theme', theme_);
+					localStorage._weasel_theme = theme_;
 				});
-				links.appendChild(print);
-			links.className = 'binary-links';
-			terminal.appendChild(links);
-		}
-		function colorIsNotClear(usedColor){
-			return (
-				_Memory.hasOwnProperty(usedColor) ||
-				( last_used_memory_slot_color != undefined &&
-					Math.abs(last_used_memory_slot_color - usedColor) < MIN_ADJACENT_SLOTS_HUE_DIFF
-				)
-			);
-		}
-		function appendMemorySlot(slotColor){
-			var memory_slot = document.createElement('li');
-			memory_slot.style.backgroundColor = `hsl(${slotColor},50%,50%)`;
-			memory_slot.id = `m-${slotColor}`;
-			memory_slot.addEventListener('click', remember.bind(null, slotColor));
-			memory_slot.addEventListener('dblclick', remember.bind(null, slotColor, undefined, true));
-			memory_slot.addEventListener('contextmenu', forget.bind(null, slotColor));
-			memory.appendChild(memory_slot);
-		}
-		function memorize(){
-			if ( message.value.length > 0 ){
-				var randomHueID;
-				do { // make a unique color/id for the _Memory
-					randomHueID = Math.floor(Math.random() * 360) + 1;
-				} while ( colorIsNotClear(randomHueID) );
-				last_used_memory_slot_color = randomHueID;
-				_Memory[randomHueID] = message.value;
-				last_remembered_slot = _Memory_order.length;
-				_Memory_order.push(randomHueID);
-				appendMemorySlot(randomHueID);
-			}
-		}
-		function remember(memorySlotID, remembered_index, also_send){
-			if ( _Memory.hasOwnProperty(memorySlotID) ){
-				message.value = _Memory[memorySlotID];
-				if( remembered_index == undefined || remembered_index >= _Memory_order.length ) last_remembered_slot = _Memory_order.indexOf(memorySlotID);
-				if (also_send === true) doSend();
-			}
-		}
-		function rememberRoll(){
-			var slots_count = _Memory_order.length;
-			if ( slots_count > 0 ){
-				if (typeof last_remembered_slot !== 'number' || last_remembered_slot >= (slots_count - 1)){
-					last_remembered_slot = 0;
+				document.getElementById('store-memory').addEventListener('click', storeMemorySlots);
+				document.getElementById('clear-storage').addEventListener('click', clearStorage);
+				document.getElementById('switch-auto-scroll').addEventListener('click', switchAutoScroll);
+				document.querySelector('#ws-construction').addEventListener('submit', function(ev){ ev.preventDefault(); message.focus(); });
+				document.querySelector('input[type="submit"][value="OPEN"]').addEventListener('click', createSocket);
+				document.querySelector('input[type="button"][value="CLOSE"]').addEventListener('click', function(){ if (WS) WS.close(); });
+				document.querySelector('input[type="button"][value="SEND"]').addEventListener('click', doSend);
+				document.querySelector('input[type="button"][value="R"]').addEventListener('click', function(){ message.value = ''; });
+				document.querySelector('input[type="button"][value="C"]').addEventListener('click', function(){ terminal.innerText = ''; });
+				document.querySelector('input[type="button"][value="M+"]').addEventListener('click', memorize);
+				document.querySelector('input[type="button"][value="<"]').addEventListener('click', timeMachine.bind(null, true));
+				document.querySelector('input[type="button"][value=">"]').addEventListener('click', timeMachine.bind(null, false));
+				document.querySelector('input[type="button"][value="blob"]').addEventListener('click', doSendBinary.bind(null, true));
+				document.querySelector('input[type="button"][value="array"]').addEventListener('click', doSendBinary.bind(null, false));
+				document.querySelector('input[type="file"]').addEventListener('change', function(ev){ file_selector_display.innerText = ( 'files' in ev.srcElement &&  ev.srcElement.files.length > 0) ? ev.srcElement.files[0].name : 'No File Selected.'; });
+				document.querySelector('input[type="file"]').value = ''; // reset the file input
+				// reload stored settings, memory, etc.
+				if( localStorage.hasOwnProperty('_weasel_theme') && typeof localStorage._weasel_theme === 'string' && localStorage._weasel_theme.length > 0 ) {
+					root.setAttribute('data-theme', localStorage._weasel_theme);
 				} else {
-					last_remembered_slot++;
+					root.setAttribute('data-theme', DEFAULT_THEME);
+					localStorage._weasel_theme = DEFAULT_THEME;
 				}
-				remember(_Memory_order[last_remembered_slot], last_remembered_slot);
-			} else {
-				writeToScreen('No Memory Slot to Rotate!', 'error');
-			}
-		}
-		function keepHistory(sent_message){
-			time_machine_index = 0;
-			time_machine.unshift(sent_message);
-			if (time_machine.length > TIME_MACHINE_CAPACITY) time_machine.pop();
-		}
-		function timeMachine( direction ){
-			if ( time_machine.length > 0 ){
-				// time_machine_index[0] is the last recent record
-				if (direction === true && time_machine_index < (time_machine.length - 1)){ // backward
-					time_machine_index++;
-				}
-				if (direction === false && time_machine_index > 0) { // forward
-					time_machine_index--;
-				}
-				message.value = time_machine[time_machine_index];
-			}
-		}
-		function forget(memorySlotID, event){
-			if (event) event.preventDefault();
-			if ( _Memory.hasOwnProperty(memorySlotID) ){
-				delete _Memory[memorySlotID];
-				var slot_index = _Memory_order.indexOf(memorySlotID);
-				if (last_remembered_slot == slot_index) last_remembered_slot = undefined;
-				_Memory_order.splice(slot_index, 1);
-				document.getElementById(`m-${memorySlotID}`).remove();
-			}
-		}
-		function storeMemorySlots(){
-			var memory_slots_to_store = {
-				order: _Memory_order,
-				slots: _Memory
-			};
-			localStorage._weasel_stored_memory_slots = JSON.stringify(memory_slots_to_store);
-			writeToScreen('Memory Slots Stored', 'opening');
-		}
-		function clearStorage(){
-			var current_theme = localStorage._weasel_theme;
-			localStorage.clear(); // but keep the theme ...
-			localStorage._weasel_theme = current_theme;
-			writeToScreen('Storage Cleared', 'error');
-		}
-		function insert_text_message(string){
-			var start = message.selectionStart;
-			var end = message.selectionEnd;
-			message.value =
-				message.value.substring(0, start) +
-				string + 
-				message.value.substring(end)
-			;
-			message.selectionStart = 
-			message.selectionEnd =
-			start + string.length;
-		}
-		document.addEventListener("DOMContentLoaded", function() {
-			root = document.getRootNode().documentElement;
-			terminal = document.getElementById('terminal');
-			message = document.getElementById('message');
-			url = document.getElementById('url');
-			protocol = document.getElementById('protocol');
-			memory = document.getElementById('memory');
-			auto_scroll_marker = document.querySelector('#switch-auto-scroll span');
-			file_selector_display = document.querySelector('#file-selector span#file-name');
-			message.value = ''; // clear text area
-			document.getElementById('dark-switcher').addEventListener('click', function(ev){
-				ev.preventDefault();
-				var is_dark = ( root.getAttribute('data-theme').indexOf('dark') === 0 ) ? true : false;
-				var theme_ = ( is_dark ? 'normal' : 'dark' );
-				root.setAttribute('data-theme', theme_);
-				localStorage._weasel_theme = theme_;
-			});
-			document.getElementById('store-memory').addEventListener('click', storeMemorySlots);
-			document.getElementById('clear-storage').addEventListener('click', clearStorage);
-			document.getElementById('switch-auto-scroll').addEventListener('click', switchAutoScroll);
-			document.querySelector('#ws-construction').addEventListener('submit', function(ev){ ev.preventDefault(); message.focus(); });
-			document.querySelector('input[type="submit"][value="OPEN"]').addEventListener('click', createSocket);
-			document.querySelector('input[type="button"][value="CLOSE"]').addEventListener('click', function(){ if (WS) WS.close(); });
-			document.querySelector('input[type="button"][value="SEND"]').addEventListener('click', doSend);
-			document.querySelector('input[type="button"][value="R"]').addEventListener('click', function(){ message.value = ''; });
-			document.querySelector('input[type="button"][value="C"]').addEventListener('click', function(){ terminal.innerText = ''; });
-			document.querySelector('input[type="button"][value="M+"]').addEventListener('click', memorize);
-			document.querySelector('input[type="button"][value="<"]').addEventListener('click', timeMachine.bind(null, true));
-			document.querySelector('input[type="button"][value=">"]').addEventListener('click', timeMachine.bind(null, false));
-			document.querySelector('input[type="button"][value="blob"]').addEventListener('click', doSendBinary.bind(null, true));
-			document.querySelector('input[type="button"][value="array"]').addEventListener('click', doSendBinary.bind(null, false));
-			document.querySelector('input[type="file"]').addEventListener('change', function(ev){ file_selector_display.innerText = ( 'files' in ev.srcElement &&  ev.srcElement.files.length > 0) ? ev.srcElement.files[0].name : 'No File Selected.'; });
-			document.querySelector('input[type="file"]').value = ''; // reset the file input
-			// reload stored settings, memory, etc.
-			if( localStorage.hasOwnProperty('_weasel_theme') && typeof localStorage._weasel_theme === 'string' && localStorage._weasel_theme.length > 0 ) {
-				root.setAttribute('data-theme', localStorage._weasel_theme);
-			} else {
-				root.setAttribute('data-theme', DEFAULT_THEME);
-				localStorage._weasel_theme = DEFAULT_THEME;
-			}
-			if( localStorage.hasOwnProperty('_weasel_last_used_url') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_url.length > 0 ) url.value = localStorage._weasel_last_used_url;
-			if( localStorage.hasOwnProperty('_weasel_last_used_protocol') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_protocol.length > 0 ) protocol.value =  localStorage._weasel_last_used_protocol;
-			if( localStorage.hasOwnProperty('_weasel_stored_memory_slots') && typeof localStorage._weasel_stored_memory_slots === 'string' && localStorage._weasel_stored_memory_slots.length > 0 ){
-				var parsed_memory_slots_storage =  JSON.parse(localStorage._weasel_stored_memory_slots);
-				_Memory =  parsed_memory_slots_storage.slots;
-				_Memory_order = parsed_memory_slots_storage.order;
-				for (var color = 0; color < _Memory_order.length; color++) {
-					appendMemorySlot( _Memory_order[color] );
-				}
-			}
-			// shortcuts
-			window.onkeyup = function(event) {
-				// console.log('Key Up: ', event.keyCode, event);
-				if( event.ctrlKey ) { // ctrl ...
-					event.preventDefault();
-					// if numeral key (also numpad) ...
-					if ( ( event.keyCode >= 48 /* 0 */ && event.keyCode <= 57 /* 9*/ ) || ( event.keyCode >= 96 /* num-0 */ && event.keyCode <= 105 /* num-9*/ ) ){
-						let number = (event.keyCode <= 57 ? Math.abs(48 - event.keyCode) : Math.abs(96 - event.keyCode) );
-						if ( number <= 9 ){ // 0 - 9 (it's always >= 0 because of .abs func )
-							// console.log('Recall Memory Slot: ', number);
-							if ( _Memory_order.length > number ){ // ... remember by index
-								remember( _Memory_order[number] );
-							}
-						}
-					} else { // other keys
-						switch (event.keyCode) {
-							case 13: // Enter
-								if (event.altKey) { // + alt + Enter
-									createSocket(); // open a connection
-								} else {
-									doSend(); // -> send text message
-								}
-								break;
-							case 77:
-								if (event.altKey) { // + alt + m
-									rememberRoll();
-								} else { // m
-									memorize();
-								}
-								break;
-							case 90:
-								if (event.altKey) { // + alt + z
-									timeMachine(true); // backward
-								}
-								break;
-							case 88:
-								if (event.altKey) { // + alt + x
-									timeMachine(false); // forward
-								}
-								break;
-							case 66:
-								if (event.altKey) { // + alt + b
-									doSendBinary(true);
-								}
-								break;
-							case 83:
-								if (event.altKey) { // + alt + s
-									switchAutoScroll();
-								}
-								break;
-						}
+				if( localStorage.hasOwnProperty('_weasel_last_used_url') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_url.length > 0 ) url.value = localStorage._weasel_last_used_url;
+				if( localStorage.hasOwnProperty('_weasel_last_used_protocol') && typeof localStorage._weasel_last_used_url === 'string' && localStorage._weasel_last_used_protocol.length > 0 ) protocol.value =  localStorage._weasel_last_used_protocol;
+				if( localStorage.hasOwnProperty('_weasel_stored_memory_slots') && typeof localStorage._weasel_stored_memory_slots === 'string' && localStorage._weasel_stored_memory_slots.length > 0 ){
+					var parsed_memory_slots_storage =  JSON.parse(localStorage._weasel_stored_memory_slots);
+					_Memory =  parsed_memory_slots_storage.slots;
+					_Memory_order = parsed_memory_slots_storage.order;
+					for (var color = 0; color < _Memory_order.length; color++) {
+						appendMemorySlot( _Memory_order[color] );
 					}
 				}
-			};
-			// Key Overrides
-			window.onkeydown = function(event) {
-				switch (event.keyCode) {
-					case 9: // Tab
-						if (message === document.activeElement){
-							if ( (event.altKey || event.ctrlKey || event.shiftKey) == false ){
-								event.preventDefault();
-								insert_text_message("\t");
+				// shortcuts
+				window.onkeyup = function(event) {
+					// console.log('Key Up: ', event.keyCode, event);
+					if( event.ctrlKey ) { // ctrl ...
+						event.preventDefault();
+						// if numeral key (also numpad) ...
+						if ( ( event.keyCode >= 48 /* 0 */ && event.keyCode <= 57 /* 9*/ ) || ( event.keyCode >= 96 /* num-0 */ && event.keyCode <= 105 /* num-9*/ ) ){
+							let number = (event.keyCode <= 57 ? Math.abs(48 - event.keyCode) : Math.abs(96 - event.keyCode) );
+							if ( number <= 9 ){ // 0 - 9 (it's always >= 0 because of .abs func )
+								// console.log('Recall Memory Slot: ', number);
+								if ( _Memory_order.length > number ){ // ... remember by index
+									remember( _Memory_order[number] );
+								}
+							}
+						} else { // other keys
+							switch (event.keyCode) {
+								case 13: // Enter
+									if (event.altKey) { // + alt + Enter
+										createSocket(); // open a connection
+									} else {
+										doSend(); // -> send text message
+									}
+									break;
+								case 77:
+									if (event.altKey) { // + alt + m
+										rememberRoll();
+									} else { // m
+										memorize();
+									}
+									break;
+								case 90:
+									if (event.altKey) { // + alt + z
+										timeMachine(true); // backward
+									}
+									break;
+								case 88:
+									if (event.altKey) { // + alt + x
+										timeMachine(false); // forward
+									}
+									break;
+								case 66:
+									if (event.altKey) { // + alt + b
+										doSendBinary(true);
+									}
+									break;
+								case 83:
+									if (event.altKey) { // + alt + s
+										switchAutoScroll();
+									}
+									break;
 							}
 						}
-						break;
-					default:
-						break;
+					}
+				};
+				// Key Overrides
+				window.onkeydown = function(event) {
+					switch (event.keyCode) {
+						case 9: // Tab
+							if (message === document.activeElement){
+								if ( (event.altKey || event.ctrlKey || event.shiftKey) == false ){
+									event.preventDefault();
+									insert_text_message('\t');
+								} else {
+									document.activeElement.nextElementSibling.focus()
+								}
+							}
+							break;
+						default:
+							break;
+					}
 				}
-			}
-		});
+			});
 		</script>
 	</head>
 	<body>

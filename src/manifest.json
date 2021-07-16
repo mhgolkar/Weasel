@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "WebSocket Weasel",
-	"version": "2.1.0",
+	"version": "2.1.1",
 	"description": "A Handy Console to Communicate with WebSocket Servers",
 	"homepage_url": "https://github.com/mhgolkar/Weasel",
 	"icons": {
