@@ -15,11 +15,11 @@ In-Browser Helper Console for WS Test and Developement
 
 Check out its github page for a [working demo](https://mhgolkar.github.io/Weasel/)  
 > Online demo may only work with WSS (Secured WS;)
-> To use with WS it's recommended to download the repo or use the [Firefox Add-on].  
+> To use with WS it's recommended to download the repo or use the [Firefox Add-on][firefox-addon].  
 
 Also available as:
 
-+ **[Firefox Add-on]**
++ **[Firefox Add-on][firefox-addon]**
 
 > Files in the `./src` directory consist the source of the Firefox add-on.  
 > If you want to just use the tool, `./weasel.html` file is the only file you need.
@@ -45,5 +45,5 @@ Also available as:
     > We can use `Ctrl + Alt + Shift + Tab` to jump out of it.
 
 <!-- Refs -->
-[Firefox Add-on]: (https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/)
+[firefox-addon]: https://addons.mozilla.org/en-US/firefox/addon/websocket-weasel/
 
